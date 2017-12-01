@@ -7,7 +7,6 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using App.Metrics.AspNetCore;
 
 namespace aspnetcore
 {
@@ -20,7 +19,6 @@ namespace aspnetcore
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseMetrics()
                 .UseStartup<Startup>()
                 .Build();
     }

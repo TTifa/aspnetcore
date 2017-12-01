@@ -8,7 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.AspNetCore.Mvc;
+using aspnetcore.Extensions;
 
 namespace aspnetcore
 {
@@ -24,6 +24,9 @@ namespace aspnetcore
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //读取配置
+            services.Configure<UploadConfig>(Configuration.GetSection("Upload"));
+
             //注册swagger
             services.AddSwaggerGen(options =>
             {
@@ -34,9 +37,8 @@ namespace aspnetcore
                     Description = "by ttifa"
                 });
             });
-            //注入appmetrics到路由中
 
-            services.AddMvc(options => options.AddMetricsResourceFilter());
+            services.AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -47,13 +49,18 @@ namespace aspnetcore
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseMvc();
+            app.UseStaticFiles();
+            app.UseMvc(routes => routes.MapRoute("default", "{controller}/{action}/{id?}"));
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>
+
             {
+
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "V1 Docs");
+
                 c.DocExpansion("none");
+
             });
         }
     }
