@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "aspnetcore", "aspnetcore\aspnetcore.csproj", "{5BBD5819-E4CA-4C2F-BCD8-2187327C72C4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "aspnetcore", "aspnetcore\aspnetcore.csproj", "{5BBD5819-E4CA-4C2F-BCD8-2187327C72C4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Entity", "Entity\Entity.csproj", "{C4BCE58F-D8E1-4A32-9EAB-A9CA3C971B4F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Redis", "Redis\Redis.csproj", "{53D45433-089C-44D9-8AA8-4D1E46207434}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{5BBD5819-E4CA-4C2F-BCD8-2187327C72C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5BBD5819-E4CA-4C2F-BCD8-2187327C72C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5BBD5819-E4CA-4C2F-BCD8-2187327C72C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4BCE58F-D8E1-4A32-9EAB-A9CA3C971B4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4BCE58F-D8E1-4A32-9EAB-A9CA3C971B4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4BCE58F-D8E1-4A32-9EAB-A9CA3C971B4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4BCE58F-D8E1-4A32-9EAB-A9CA3C971B4F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53D45433-089C-44D9-8AA8-4D1E46207434}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53D45433-089C-44D9-8AA8-4D1E46207434}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53D45433-089C-44D9-8AA8-4D1E46207434}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53D45433-089C-44D9-8AA8-4D1E46207434}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

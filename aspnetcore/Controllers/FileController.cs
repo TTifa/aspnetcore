@@ -1,8 +1,7 @@
-﻿using aspnetcore.Extensions;
+﻿using Entity;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Qiniu.Http;
 using Qiniu.IO;
 using Qiniu.IO.Model;
 using Qiniu.Util;

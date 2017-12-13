@@ -1,0 +1,76 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE HTML>
+<html dir="ltr" lang="en-US">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Login</title>
+    <link href="~/css/login.css" rel="stylesheet" />
+    <script src="~/lib/jquery/jquery.min.js"></script>
+</head>
+<body>
+    <div id="container">
+        <form action="" method="post">
+            <div class="login">LOGIN <label id="tip" style="color:red;font-size:80%;margin-left:10px"></label></div>
+            <div class="username-text">Username:</div>
+            <div class="password-text">Password:</div>
+            <div class="username-field">
+                <input type="text" id="username" name="username" />
+            </div>
+            <div class="password-field">
+                <input type="password" id="password" name="password" />
+            </div>
+            <input type="checkbox" name="rememberme" id="rememberme" /><label for="rememberme">Remember me</label>
+            <div class="forgot-usr-pwd">Forgot <a href="#">username</a> or <a href="#">password</a>?</div>
+            <input type="submit" id="signin" name="submit" value="GO" />
+        </form>
+    </div>
+    <div id="footer">
+        <strong>Copyright &copy; 2016-2017 <a href="#">KiMo Studio</a>.</strong> All rights
+    </div>
+    <script>
+        $(function () {
+            $("form").submit(function (e) {
+                e.preventDefault();
+            });//禁用form提交冒泡
+            $('#signin').bind('click', signin);
+        })
+        function signin() {
+            var param = {
+                UserName: $('#username').val(),
+                Password: $('#password').val(),
+                RememberMe: $('#rememberme').val()
+            };
+            if (!param.UserName || param.UserName.length <= 1) {
+                $('#tip').text('please input username');
+                return;
+            }
+            if (!param.Password || param.Password.length <= 1) {
+                $('#tip').text('please input password');
+                return;
+            }
+            $.ajax({
+                url: '/Account/SignIn',
+                type: 'post',
+                data: param,
+                dataType: 'json',
+                success: function (e) {
+                    if (e.status == 1) {
+                        var currentUser = {
+                            Uid: e.data.Uid,
+                            Username: e.data.Username,
+                            Token: e.data.Token
+                        }
+                        localStorage.setItem('LoginedUser', JSON.stringify(currentUser));
+
+                        location.href = '/Home/Index';
+                    } else {
+                        $('#tip').text(e.msg);
+                    }
+                }
+            })
+        }
+    </script>
+</body>
+</html>

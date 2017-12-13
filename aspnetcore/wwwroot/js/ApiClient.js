@@ -1,104 +1,89 @@
-﻿/*
- * 公共接口调用方法，基于jQuery.js
- *  调用步骤：
- *      1.[必填]设置服务器Host
- *          ApiClient.SetServerHost("http://localhost:15049/api");
- *      2.[可选]设置请求Token
- *          ApiClient.SetToken("43ac9fbe2cb22679064b2003291334c8");
- *      3.[可选]设置请求方法类型，默认请求方法为 get/jsonp
- *          ApiClient.SetRequest("post","json"); 
- *      4.[可选]设置请求遮罩层显示/隐藏
- *          ApiClient.SetMask(mDialog.ShowLoading,mDialog.HideLoading);
- *      5.[可选]设置弹窗提示事件
- *          ApiClient.SetDialog(alert,alert,alert)
- *      6.[必填]发送请求【推荐方法二】
- *          方法一、【不推荐】传递全参数，必须按照以下参数顺序【controller, action, data, success, error, complete, async, encrypt】调用
- *              ApiClient.Request("values","get",{
- *                  data: "eOZ9/jfFv438DJCLpSdJeTAv9KgAGK5xF5Cfkq0vGKXSdH2XQch/wI5kBh0r28J0DJJPTRHfhqSg/x8kewmhaQ=="
- *              },function(){ // 成功事件
- *              },function(){ // 失败事件
- *              },function(){ // 完成事件
- *              },true);
- *          方法二、【推荐】传递一个对象
- *              ApiClient.Request({
- *                  controller: "test", // 控制器名称
- *                  action: "get",  // Action名称
- *                  encrypt: false, // 是否请求加密，默认为false，选填
- *                  async: true,    // 是否异步请求，默认为true，选填
- *                  data: {
- *                      userId: "10086"
- *                  },
- *                  success: function(e){ },    // 请求成功事件，选填
- *                  error: function(XMLHttpRequest, textStatus, errorThrown){ },    // 请求失败事件，选填
- *                  complete: function(XMLHttpRequest, textStatus){ },  // 请求完成事件（成功、失败都会调用），选填
- *              });
- */
-(function (window, $) {
-
-    var _host = '/'; // 服务端Host
-    var _requestMethod = "post"; // 请求类型：get/post
-    var _requestDataType = "json"; // 预期服务器返回的数据类型
-
+﻿(function (window, $) {
     // 遮罩层对象
     var _mask = {
         show: function () { },
         hide: function () { }
     };
-
-    // 提示弹窗
-    var _dialog = {
-        alert: function (message) { alert(message); }, // 强提示信息
-        error: function (message) { alert(message); }, // 错误输出信息
-        tips: function (message) { alert(message); } // 弱提示信息
+    var _user = {
+        uid: 0,
+        username: '',
+        token: ''
     };
-
+    var _dialog = {
+        alert: function (msg) { alert(msg); },
+        confirm: function (msg, ok, no) {
+            if (confirm(msg)) {
+                if (typeof (ok) === 'function')
+                    ok();
+            }
+            else if (typeof (no) === "function")
+                no();
+        }
+    };
     var _client = {
-
         /**
-         * 获取设置的服务端Host
+         * *  请求接口
+         * @param {string} api 请求接口
+         * @param {object} args 请求参数
+         * @param {function} cb 回调
+         * @param {string} loading 显示loading
+         * @return void
          */
-        GetServerHost: function () {
-            return _host;
+        Request: function (api, args, cb, loading) {
+            if (typeof (args) != 'object') {
+                _dialog.alert('params error');
+            }
+            (loading || loading == '') && _mask.show(loading);
+            $.ajax({
+                type: 'post',
+                url: api,
+                dataType: 'json',
+                data: subData,
+                beforeSend: function (request) {
+                    request.setRequestHeader("Token", _user.token);
+                },
+                success: function (data) {
+                    _mask.hide();
+                    // 未登录
+                    if (data.status == 2) {
+                        location.href = '/Account/SignIn';
+                    }
+
+                    cb(data);
+                },
+                error: function (xmlRequest, textStatus, errorThrown) {
+                    _dialog.alert('network error!');
+                    _mask.hide();
+                    console.log(textStatus);
+                }
+            });
         },
+        combineData: function (service, data) {
+            var common = {};
+            common.format = config.common.format;
+            common.v = config.common.v;
+            common.partner = config.common.partner;
+            common.sec_id = config.common.sec_id;
+            common.req_data = data;
+            common.service = service;
+            var str = this.getStr(common);
+            var md5Str = md5(str + 111111).toUpperCase();
+            common.sign = md5Str;
 
-        /**
-         * 初始化服务端Host
-         *  @param host String 请求服务端地址（http://{ip}:{port}/）
-         */
-        SetServerHost: function (host) {
-            if (!host) {
-                log("server host is null or empty.");
-                return this;
-            }
-
-            if (host.substring(host.length - 1) != "/")
-                host += "/";
-
-            _host = host;
-
-            return this;
+            return common;
         },
-
-        /**
-         * 设置请求类型
-         *  @param methodType String 请求类型：get/post
-         *  @param dataType String 预期服务器返回的数据类型
-         */
-        SetRequest: function (methodType, dataType) {
-            if (methodType != "get" && methodType != "post") {
-                log("request method is not supported.");
-                return this;
+        getStr: function (dic) {
+            var sdic = Object.keys(dic).sort();
+            var str = '';
+            for (var ki in sdic) {
+                str += sdic[ki] + "=" + dic[sdic[ki]] + "&";
             }
-
-            if (dataType != "json" && dataType != "jsonp") {
-                log("datatype is not supported.")
-                return this;
-            }
-
-            _requestMethod = methodType;
-            _requestDataType = dataType;
-
-            return this;
+            return str.substring(0, str.length - 1);
+        },
+        urlParam: function (name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return decodeURI(r[2]); return null;
         },
 
         /**
@@ -106,9 +91,9 @@
          *  @param show Function 显示遮罩层方法
          *  @param hide Function 隐藏遮罩层方法
          */
-        SetMask: function (show, hide) {
+        setMask: function (show, hide) {
             if (!(typeof show === "function" && typeof hide === "function")) {
-                log("mask event must be a function.");
+                console.log("mask event must be a function.");
                 return this;
             }
 
@@ -118,143 +103,76 @@
         },
 
         /**
-         * 设置弹窗提示事件
-         *  @param _alert Function 强提示方法
-         *  @param _error Function 错误提示方法
-         *  @param _tips Function 弱提示方法
+         * 设置对话框
          */
-        SetDialog: function (_alert, _error, _tips) {
+        setDialog: function (_alert, _confirm) {
             if (typeof _alert != "function") {
-                log("dialog event must be a function.");
+                console.log("dialog event must be a function.");
                 return this;
             }
 
             _dialog = {
                 alert: _alert,
-                error: (typeof _error === "function") ? _error : _alert,
-                tips: (typeof _tips === "function") ? _tips : _alert
+                confirm: (typeof _confirm === "function") ? _confirm : confirm,
             };
 
             return this;
         },
 
         /**
-         * 发送请求
-         *  @param controller string 控制器名称
-         *  @param action string Action名称
-         *  @param data JSON 请求参数JSON对象
-         *  @param success Function 请求成功事件
-         *  @param error Function 请求失败事件
-         *  @param complete Function 请求完成事件（成功、失败都会调用）
-         *  @param async Boolean 是否异步请求，默认为true
-         *  @param loading Boolean 是否显示Loading遮罩层，默认为true
+         * 设置登陆用户信息
          */
-        Request: function (controller, action, data, success, error, complete, async, loading) {
-            return request(controller, action, data, success, error, complete, async, loading);
-        }
-    };
+        setUser: function (uid, username, token) {
+            _user.uid = uid;
+            _user.username = username;
+            _user.token = token;
 
-    // 记录日志
-    function log(message) {
-        console.log(message);
+            return this;
+        },
+        getUserId: function () {
+            return _user.uid;
+        },
+        getUserName: function () {
+            return _user.username;
+        },
+        getToken: function () {
+            return _user.token;
+        }
     }
-
-    /**
-     * 获取参数信息
-     *  @param diffCase bool 是否区分大小写，默认为false
-     */
-    function getArgs(diffCase) {
-        diffCase = typeof diffCase === "boolen" ? diffCase : false;
-
-        var caller = arguments.callee.caller;//获取调用函数
-        if (caller == null || caller.arguments.length == 0)
-            return result;
-
-        // 压缩js后函数参数名称会变化，所以这里写死参数名
-        // var argArray = AppUtils.GetArgumentNamesOfFunction(caller);
-        var argArray = ["controller", "action", "data", "success", "error", "complete", "async", "loading"];
-        var result = {};
-        var params = caller.arguments[0];//获取参数对象
-        var index = typeof (params) == "object" ? 1 : 0;//是否是对象，是对象返回赋值索引1
-        if (index == 1) {
-            for (var p in params) {
-                for (var i = 0; i < argArray.length; i++) {
-                    var arg = AppUtils.Trim(argArray[i]);
-                    if (diffCase) {
-                        if (arg == p) {
-                            result[arg] = params[p];
-                            break;
-                        }
-                    } else {
-                        if (arg.toLocaleLowerCase() == p.toLocaleLowerCase()) {
-                            result[arg] = params[p];
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        else {
-            for (var i = index; i < argArray.length && i < caller.arguments.length; i++) {
-                result[AppUtils.Trim(argArray[i])] = caller.arguments[i];
-            }
-        }
-
-        return result;
-    }
-
-    // 获取请求URL
-    function getUrl(controller, action) {
-        if (!(_host && controller && action)) {
-            _dialog.error("找不到服务地址");
-            return;
-        }
-
-        return _host + controller + "/" + action;
-    }
-
-    // 发送请求
-    function request(controller, action, data, success, error, complete, async, loading) {
-        var url = getUrl(controller, action);
-        if (!url) {
-            log("请求地址异常");
-            return;
-        }
-
-        if (typeof loading != "boolean") loading = true;
-        var result = null;
-        $.ajax({
-            type: _requestMethod,
-            dataType: _requestDataType,
-            //jsonp: "jsonp",
-            async: async === false ? false : true,
-            url: url,
-            data: data,
-            beforeSend: function (XMLHttpRequest) {
-                loading && _mask.show();
-            },
-            success: function (e) {
-                loading && _mask.hide();
-                if (typeof success === "function") success(e);
-                result = e;
-            },
-            error: function (XMLHttpRequest, textStatus, errorThrown) {
-                loading && _mask.hide();
-                if (typeof error === "function") error(XMLHttpRequest, textStatus, errorThrown);
-            },
-            complete: function (XMLHttpRequest, textStatus) {
-                if (typeof complete === "function") complete(XMLHttpRequest, textStatus);
-            }
-        });
-        return result;
-    }
-
     window.APIClient = window.ApiClient = _client;
 
+    var _config = {
+        common: {
+            format: "json",
+            v: "1.0",
+            partner: "2015000000000000",
+            sec_id: "md5",
+            url: "http://localhost/",
+        },
+        Api: {
+            Login: '/Account/SignIn', //登录
+        },
+        NoLoginPage: ['/Account/SignIn']
+    }
+
+    window.config = _config;
 })(window, jQuery);
 
 (function (window, $) {
-
-    //ApiClient.SetDialog(AppUtils.Dialog.Alert, AppUtils.Dialog.Error, AppUtils.Dialog.Tips);
-
+    var account = localStorage.getItem('LoginedUser');
+    if (account) {
+        account = JSON.parse(account);
+        APIClient.setUser(account.Uid, account.Username, account.Token);
+    } else {
+        var path = window.location.pathname.toLowerCase();
+        var noLogin = false;
+        for (var i = 0; i < config.NoLoginPage.length; i++) {
+            if (config.NoLoginPage[i] == path) {
+                noLogin = true;
+                break;
+            }
+        }
+        if (!noLogin)
+            window.location.href = '/Account/SignIn';
+    }
 })(window, jQuery);

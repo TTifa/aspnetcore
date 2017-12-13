@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Entity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using aspnetcore.Extensions;
+using Redis;
 
 namespace aspnetcore
 {
@@ -26,6 +22,10 @@ namespace aspnetcore
         {
             //读取配置
             services.Configure<UploadConfig>(Configuration.GetSection("Upload"));
+
+            services.AddDbContext<TtifaContext>(options => options.UseNpgsql(Configuration.GetConnectionString("Postgres")));
+
+            services.AddSingleton(new RedisClient(Configuration.GetConnectionString("Redis")));
 
             //注册swagger
             services.AddSwaggerGen(options =>

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace aspnetcore.Extensions
+namespace Entity
 {
     public class UploadConfig
     {
