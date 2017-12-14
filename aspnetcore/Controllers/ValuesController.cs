@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using aspnetcore.Filters;
 
 namespace aspnetcore.Controllers
 {
@@ -10,23 +11,25 @@ namespace aspnetcore.Controllers
     public class ValuesController : Controller
     {
         // GET api/values
-        [HttpGet]
+        [HttpGet, Log]
         public IEnumerable<string> Get()
         {
-            return new string[] { "value1", "value2" };
+            throw new Exception("test exception");
+            //return new string[] { "value1", "value2" };
         }
 
         // GET api/values/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        [HttpGet("{id}"), Log]
+        public ApiResult Get(int id)
         {
-            return "value";
+            return new ApiResult();
         }
 
         // POST api/values
         [HttpPost]
-        public void Post([FromBody]string value)
+        public void Post()
         {
+            throw new Exception("test exception");
         }
 
         // PUT api/values/5

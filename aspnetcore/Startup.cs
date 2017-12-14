@@ -1,4 +1,5 @@
-﻿using Entity;
+﻿using aspnetcore.Filters;
+using Entity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +28,8 @@ namespace aspnetcore
 
             services.AddSingleton(new RedisClient(Configuration.GetConnectionString("Redis")));
 
+
+
             //注册swagger
             services.AddSwaggerGen(options =>
             {
@@ -38,7 +41,10 @@ namespace aspnetcore
                 });
             });
 
-            services.AddMvc();
+            services.AddMvc(options =>
+            {
+                options.Filters.Add(new ApiExceptionAttribute());
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

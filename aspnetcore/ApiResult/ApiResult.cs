@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace aspnetcore
 {
-    public class ApiResult
+    public class ApiResult : ActionResult
     {
         /// <summary>
         /// 消息
@@ -33,13 +35,37 @@ namespace aspnetcore
         /// </summary>
         [JsonProperty("page")]
         public ApiResultPage Page { get; set; }
-
+        protected JsonSerializerSettings SerializerSettings;
         public ApiResult(ApiStatus status = ApiStatus.OK, string message = null, object data = null, ApiResultPage page = null)
         {
             this.Status = status;
             this.Message = message;
             this.Data = data;
             this.Page = page;
+        }
+
+        public override Task ExecuteResultAsync(ActionContext context)
+        {
+            var response = context.HttpContext.Response;
+            response.ContentType = "text/json";
+            if (SerializerSettings == null)
+            {
+                SetSerializerSettings();
+            }
+
+            return response.WriteAsync(JsonConvert.SerializeObject(this, Formatting.None, SerializerSettings));
+        }
+
+        protected virtual void SetSerializerSettings()
+        {
+            SerializerSettings = new JsonSerializerSettings
+            {
+                //空值的属性不序列化
+                //NullValueHandling = NullValueHandling.Ignore,
+                //Json 中存在的属性，实体中不存在的属性不反序列化
+                //MissingMemberHandling = MissingMemberHandling.Ignore,
+                DateFormatString = "yyyy-MM-dd HH:mm:ss"
+            };
         }
     }
 

@@ -1,7 +1,6 @@
 ﻿using Entity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using Redis;
 using System;
 using System.Linq;
@@ -38,12 +37,10 @@ namespace aspnetcore.Controllers
             db.SaveChanges();
 
             var redis = _redisCli.GetDatabase();
-            redis.StringSet($"UserToken:{token}", JsonConvert.SerializeObject(new
-            {
-                user.Uid,
-                user.Username,
-                ExpiredTime = DateTime.Now.AddDays(1)
-            }));
+            var tokenKey = $"UserToken:{token}";
+            redis.HashSet(tokenKey, "Uid", user.Uid);
+            redis.HashSet(tokenKey, "Username", user.Username);
+            redis.HashSet(tokenKey, "ExpiredTime", DateTime.Now.AddDays(3).ToString());
 
             return new ApiResult(data: new
             {

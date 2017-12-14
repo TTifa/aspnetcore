@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Redis;
-using StackExchange.Redis;
 using System;
 using System.Linq;
 
@@ -24,7 +23,7 @@ namespace aspnetcore.Controllers
             token = context.HttpContext.Request.Headers["Token"].FirstOrDefault();
             if (string.IsNullOrEmpty(token))
             {
-                context.Result = new JsonResult(new ApiResult(ApiStatus.NoLogin));
+                context.Result = new JsonResult(new ApiResult(ApiStatus.NoLogin, "请登录"));
                 return;
             }
 
@@ -32,11 +31,10 @@ namespace aspnetcore.Controllers
             var tokenKey = $"UserToken:{token}";
             if (!redis.KeyExists(tokenKey))
             {
-                context.Result = new JsonResult(new ApiResult(ApiStatus.NoLogin));
+                context.Result = new JsonResult(new ApiResult(ApiStatus.NoLogin, "登录信息错误"));
                 return;
             }
-
-            var expiredTime = Convert.ToDateTime(redis.HashGet(tokenKey, "ExpiredTime"));
+            var expiredTime = Convert.ToDateTime(redis.HashGet(tokenKey, "ExpiredTime").ToString());
             if (expiredTime < DateTime.Now)
             {
                 context.Result = new JsonResult(new ApiResult(ApiStatus.NoLogin, "登录信息已过期，请重新登录"));

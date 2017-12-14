@@ -170,13 +170,13 @@ namespace Redis
         }
         public string[] hmget(string key, string[] fields)
         {
-            List<RedisValue> list = new List<RedisValue>();
+            var fieldArray = new RedisValue[fields.Length];
             for (int i = 0; i < fields.Length; i++)
             {
-                list.Add(fields[i]);
+                fieldArray[i] = fields[i];
             }
 
-            return GetDatabase().HashGet(key, list.ToArray()).ToStringArray();
+            return GetDatabase().HashGet(key, fieldArray).ToStringArray();
         }
 
         public bool hset(string key, string field, string value)
@@ -184,11 +184,13 @@ namespace Redis
             return GetDatabase().HashSet(key, field, value);
         }
 
-        public void hmset(string key, Dictionary<string, string> kvs)
+        public void hmset(string key, List<KeyValuePair<string, string>> kvs)
         {
             var list = new List<HashEntry>();
             foreach (var kv in kvs)
+            {
                 list.Add(new HashEntry(kv.Key, kv.Value));
+            }
 
             GetDatabase().HashSet(key, list.ToArray());
         }
