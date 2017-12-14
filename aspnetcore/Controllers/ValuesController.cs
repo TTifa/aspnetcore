@@ -14,8 +14,7 @@ namespace aspnetcore.Controllers
         [HttpGet, Log]
         public IEnumerable<string> Get()
         {
-            throw new Exception("test exception");
-            //return new string[] { "value1", "value2" };
+            return new string[] { "value1", "value2" };
         }
 
         // GET api/values/5
@@ -29,7 +28,6 @@ namespace aspnetcore.Controllers
         [HttpPost]
         public void Post()
         {
-            throw new Exception("test exception");
         }
 
         // PUT api/values/5
