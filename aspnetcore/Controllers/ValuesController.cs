@@ -18,10 +18,10 @@ namespace aspnetcore.Controllers
         }
 
         // GET api/values/5
-        [HttpGet("{id}"), Log]
+        [HttpGet("{id}")]
         public ApiResult Get(int id)
         {
-            return new ApiResult();
+            throw new Exception("unkown error");
         }
 
         // POST api/values

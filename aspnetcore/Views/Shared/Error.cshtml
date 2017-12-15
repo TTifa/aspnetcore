@@ -1,0 +1,29 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE HTML>
+<html dir="ltr" lang="en-US">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Warn</title>
+    <link rel="stylesheet" href="~/css/login.css" type="text/css" />
+    <script src="~/lib/jquery/jquery.min.js"></script>
+</head>
+<body>
+    <div id="container">
+        <div class="welcome">
+            <div class="welcome-user" id="code" error-code="@ViewBag.StatusCode">Error @ViewBag.StatusCode</div>
+            <div class="welcome-text" id="404" style="display:none">Page no found.</div>
+            <div class="welcome-text" id="500" style="display:none">Looks like something went wrong.</div>
+            <div class="home"><a href="/Home/Index">HOME</a></div>
+        </div>
+    </div>
+    <div id="footer"></div>
+    <script>
+        $(function () {
+            if ($('#code').attr('error-code') == '404') $('#404').show();
+            else $('#500').show();
+        })
+    </script>
+</body>
+</html>

@@ -43,7 +43,7 @@ namespace aspnetcore
 
             services.AddMvc(options =>
             {
-                options.Filters.Add(new ApiExceptionAttribute());
+                //options.Filters.Add(new ApiExceptionAttribute());
             });
         }
 
@@ -54,19 +54,22 @@ namespace aspnetcore
             {
                 app.UseDeveloperExceptionPage();
             }
+            else
+            {
+                app.UseExceptionHandler("/Home/Error");
+            }
+            //app.UseStatusCodePages();
+            //app.UseStatusCodePagesWithRedirects("~/error/{0}");//客户端跳转
+            app.UseStatusCodePagesWithReExecute("/Error", "?code={0}");//服务端跳转
 
             app.UseStaticFiles();
-            app.UseMvc(routes => routes.MapRoute("default", "{controller}/{action}/{id?}"));
+            app.UseMvc(routes => routes.MapRoute("default", "{controller=Home}/{action=Index}/{id?}"));
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>
-
             {
-
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "V1 Docs");
-
                 c.DocExpansion("none");
-
             });
         }
     }
