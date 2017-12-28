@@ -108,6 +108,17 @@ namespace aspnetcore.Middleware
             }
         }
 
+        public static string WriteToken(ApiToken token)
+        {
+            var redis = new RedisClient().GetDatabase();
+            var tokenKey = $"UserToken:{token.Guid}";
+            redis.HashSet(tokenKey, "Uid", token.Uid);
+            redis.HashSet(tokenKey, "Username", token.Username);
+            redis.HashSet(tokenKey, "ExpiredTime", token.ExpiredTime.ToString());
+
+            return token.Guid;
+        }
+
         /// <summary>
         /// get userinfo by token
         /// </summary>
@@ -133,7 +144,7 @@ namespace aspnetcore.Middleware
 
             var claimIdentity = new ClaimsIdentity("token");
             claimIdentity.AddClaim(new Claim(JwtClaimTypes.Id, dict["Uid"]));
-            claimIdentity.AddClaim(new Claim(nameof(Entity.LoginedUser.ExpiredTime), dict["ExpiredTime"]));
+            claimIdentity.AddClaim(new Claim(JwtClaimTypes.Expiration, dict["ExpiredTime"]));
             claimIdentity.AddClaim(new Claim(JwtClaimTypes.Name, dict["Username"]));
             claimIdentity.AddClaim(new Claim(ClaimTypes.Name, dict["Username"]));//HttpContext.User.Identity.Name
             var principal = new ClaimsPrincipal(claimIdentity);

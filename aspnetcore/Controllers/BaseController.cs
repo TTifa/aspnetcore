@@ -19,7 +19,7 @@ namespace aspnetcore.Controllers
                 CurrentUser = new LoginedUser();
                 CurrentUser.Uid = Convert.ToInt32(principal.FindFirstValue(JwtClaimTypes.Id));
                 CurrentUser.Username = principal.FindFirstValue(JwtClaimTypes.Name);
-                CurrentUser.ExpiredTime = Convert.ToDateTime(principal.FindFirstValue(nameof(LoginedUser.ExpiredTime)));
+                CurrentUser.ExpiredTime = Convert.ToDateTime(principal.FindFirstValue(JwtClaimTypes.Expiration));
             }
 
             base.OnActionExecuting(context);

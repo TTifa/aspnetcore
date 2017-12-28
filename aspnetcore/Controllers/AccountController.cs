@@ -1,4 +1,5 @@
-﻿using Entity;
+﻿using aspnetcore.Middleware;
+using Entity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Redis;
@@ -33,20 +34,22 @@ namespace aspnetcore.Controllers
 
             user.LastLoginTime = DateTime.Now;
             user.LastLoginIP = HttpContext.Connection.RemoteIpAddress.ToString();
-            var token = Guid.NewGuid().ToString("N");
             db.SaveChanges();
 
-            var redis = _redisCli.GetDatabase();
-            var tokenKey = $"UserToken:{token}";
-            redis.HashSet(tokenKey, "Uid", user.Uid);
-            redis.HashSet(tokenKey, "Username", user.Username);
-            redis.HashSet(tokenKey, "ExpiredTime", DateTime.Now.AddDays(3).ToString());
+            var token = new ApiToken
+            {
+                Guid = Guid.NewGuid().ToString("N"),
+                Uid = user.Uid,
+                Username = user.Username,
+                ExpiredTime = DateTime.Now.AddDays(3)
+            };
+            var tokenString = TokenHandler.WriteToken(token);
 
             return new ApiResult(data: new
             {
                 user.Uid,
                 user.Username,
-                Token = token
+                Token = tokenString
             });
         }
 

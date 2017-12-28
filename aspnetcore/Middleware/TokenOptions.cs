@@ -19,4 +19,12 @@ namespace aspnetcore.Middleware
             set { base.Events = value; }
         }
     }
+
+    public class ApiToken
+    {
+        public string Guid { get; set; }
+        public int Uid { get; set; }
+        public string Username { get; set; }
+        public DateTime ExpiredTime { get; set; }
+    }
 }
