@@ -15,10 +15,10 @@ namespace aspnetcore.Controllers
 {
     public class FileController : Controller
     {
-        private readonly UploadConfig _uploadConfig;
+        private readonly UploadOptions _uploadConfig;
         private readonly IHostingEnvironment _env;
 
-        public FileController(IOptions<UploadConfig> config, IHostingEnvironment env)
+        public FileController(IOptions<UploadOptions> config, IHostingEnvironment env)
         {
             this._uploadConfig = config.Value;
             _env = env;
@@ -73,7 +73,7 @@ namespace aspnetcore.Controllers
                 return new ApiResult(ApiStatus.Illegal, "files total size > 10MB , server refused!");
             }
 
-            var domain = _uploadConfig.qiniuDomain;
+            var domain = _uploadConfig.QiniuDomain;
             var urls = new List<string>();
             var token = GetQiniuToken();
             var fu = new FormUploader();

@@ -9,3 +9,11 @@
     </h1>
 </section>
 <section class="content"></section>
+
+<script>
+    function api() {
+        ApiClient.Request('/Account/Test', {}, function (e) {
+            console.log(JSON.stringify(e));
+        })
+    }
+</script>

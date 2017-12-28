@@ -22,6 +22,8 @@ namespace Redis
                 return redisConnection;
             });
 
+        public RedisClient() { }
+
         public RedisClient(ConfigurationOptions options)
         {
             _options = options;

@@ -38,9 +38,11 @@
                 type: 'post',
                 url: api,
                 dataType: 'json',
-                data: subData,
+                data: args,
                 beforeSend: function (request) {
-                    request.setRequestHeader("Token", _user.token);
+                    if (_user.token)
+                        //request.setRequestHeader('access_token', `Bearer  ${_user.token}`);
+                        request.setRequestHeader('access_token', _user.token);
                 },
                 success: function (data) {
                     _mask.hide();

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Entity
 {
-    public class UploadConfig
+    public class UploadOptions
     {
         /// <summary>
         /// 图片上传路径
@@ -15,6 +15,6 @@ namespace Entity
         public string QiniuAK { get; set; }
         public string QiniuSK { get; set; }
         public string QiniuBucket { get; set; }
-        public string qiniuDomain { get; set; }
+        public string QiniuDomain { get; set; }
     }
 }

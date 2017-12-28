@@ -56,6 +56,18 @@ namespace aspnetcore
             return response.WriteAsync(JsonConvert.SerializeObject(this, Formatting.None, SerializerSettings));
         }
 
+        public Task ExecuteApiResultAsync(HttpContext context)
+        {
+            var response = context.Response;
+            response.ContentType = "text/json";
+            if (SerializerSettings == null)
+            {
+                SetSerializerSettings();
+            }
+
+            return response.WriteAsync(JsonConvert.SerializeObject(this, Formatting.None, SerializerSettings));
+        }
+
         protected virtual void SetSerializerSettings()
         {
             SerializerSettings = new JsonSerializerSettings
