@@ -1,17 +1,9 @@
-﻿using aspnetcore.Filters;
-using Entity;
-using IdentityModel;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
+﻿using Entity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using Redis;
 using System;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Security.Claims;
-using System.Text;
 
 namespace aspnetcore.Controllers
 {
@@ -94,13 +86,5 @@ namespace aspnetcore.Controllers
         }
         */
         #endregion
-
-        [Authorize, Log]
-        public ApiResult Test()
-        {
-            var user = HttpContext.User;
-
-            return new ApiResult(data: user.FindFirst(JwtClaimTypes.Name).Value);
-        }
     }
 }

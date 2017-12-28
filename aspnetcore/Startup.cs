@@ -1,18 +1,11 @@
-﻿using aspnetcore.Filters;
-using aspnetcore.Middleware;
+﻿using aspnetcore.Middleware;
 using Entity;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using Redis;
-using System;
-using System.Text;
 
 namespace aspnetcore
 {
@@ -124,8 +117,9 @@ namespace aspnetcore
                 app.UseExceptionHandler("/Home/Error");
             }
 
+            //400、500错误页面
             //app.UseStatusCodePagesWithRedirects("~/error/{0}");//客户端跳转
-            app.UseStatusCodePagesWithReExecute("/Error", "?code={0}");//服务端跳转
+            //app.UseStatusCodePagesWithReExecute("/Home/Error", "?code={0}");//服务端跳转
 
             app.UseStaticFiles();
 

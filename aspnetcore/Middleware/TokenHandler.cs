@@ -1,15 +1,13 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using IdentityModel;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.Text.Encodings.Web;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using System.Security.Claims;
 using Redis;
-using IdentityModel;
+using System;
+using System.Linq;
+using System.Security.Claims;
+using System.Text.Encodings.Web;
+using System.Threading.Tasks;
 
 namespace aspnetcore.Middleware
 {
@@ -135,6 +133,7 @@ namespace aspnetcore.Middleware
 
             var claimIdentity = new ClaimsIdentity("token");
             claimIdentity.AddClaim(new Claim(JwtClaimTypes.Id, dict["Uid"]));
+            claimIdentity.AddClaim(new Claim(nameof(Entity.LoginedUser.ExpiredTime), dict["ExpiredTime"]));
             claimIdentity.AddClaim(new Claim(JwtClaimTypes.Name, dict["Username"]));
             claimIdentity.AddClaim(new Claim(ClaimTypes.Name, dict["Username"]));//HttpContext.User.Identity.Name
             var principal = new ClaimsPrincipal(claimIdentity);

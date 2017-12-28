@@ -1,23 +1,31 @@
 ﻿using Entity;
+using IdentityModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Redis;
 using System;
-using System.Linq;
+using System.Security.Claims;
 
 namespace aspnetcore.Controllers
 {
     public class BaseController : Controller
     {
-        protected RedisClient _redisCli;
         protected LoginedUser CurrentUser { get; set; }
-        protected string token;
 
-        public BaseController(RedisClient redisCli)
+        public override void OnActionExecuting(ActionExecutingContext context)
         {
-            _redisCli = redisCli;
+            var principal = context.HttpContext.User;
+            if (principal.Identity != null && principal.Identity.IsAuthenticated)
+            {
+                CurrentUser = new LoginedUser();
+                CurrentUser.Uid = Convert.ToInt32(principal.FindFirstValue(JwtClaimTypes.Id));
+                CurrentUser.Username = principal.FindFirstValue(JwtClaimTypes.Name);
+                CurrentUser.ExpiredTime = Convert.ToDateTime(principal.FindFirstValue(nameof(LoginedUser.ExpiredTime)));
+            }
+
+            base.OnActionExecuting(context);
         }
 
+        /*
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             token = context.HttpContext.Request.Headers["Token"].FirstOrDefault();
@@ -48,5 +56,6 @@ namespace aspnetcore.Controllers
 
             base.OnActionExecuting(context);
         }
+        */
     }
 }
