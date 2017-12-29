@@ -6,14 +6,14 @@ namespace Entity
 {
     public class TtifaContext : DbContext
     {
-        public DbSet<User> Users { get; set; }
+        public DbSet<User> users { get; set; }
 
         public TtifaContext(DbContextOptions<TtifaContext> options) : base(options)
         { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //modelBuilder.Entity<User>().ToTable("users");//默认：Users
+            //modelBuilder.Entity<User>().ToTable("users");
         }
     }
 

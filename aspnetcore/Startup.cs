@@ -28,6 +28,8 @@ namespace aspnetcore
 
             services.AddSingleton(new RedisClient(Configuration.GetConnectionString("Redis")));
 
+            //services.Configure<ForwardedHeadersOptions>(option => { option.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForward‌​edFor; });
+
             //注册swagger
             /*
             services.AddSwaggerGen(options =>
@@ -116,6 +118,11 @@ namespace aspnetcore
             {
                 app.UseExceptionHandler("/Home/Error");
             }
+
+            app.UseForwardedHeaders(new ForwardedHeadersOptions()
+            {
+                ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.All
+            });
 
             //400、500错误页面
             //app.UseStatusCodePagesWithRedirects("~/error/{0}");//客户端跳转

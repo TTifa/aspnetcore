@@ -29,7 +29,7 @@ namespace aspnetcore.Controllers
         [HttpPost]
         public ApiResult SignIn(string username, string password)
         {
-            var user = db.Users.FirstOrDefault(o => o.Username == username && o.Pwd == password);
+            var user = db.users.FirstOrDefault(o => o.Username == username && o.Pwd == password);
             if (user == null)
                 return new ApiResult(ApiStatus.Fail);
 

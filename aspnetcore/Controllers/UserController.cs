@@ -1,4 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace aspnetcore.Controllers
 {
@@ -8,7 +12,9 @@ namespace aspnetcore.Controllers
     {
         public ApiResult Get()
         {
-            return new ApiResult(data: CurrentUser);
+            var ip = HttpContext.Connection.RemoteIpAddress.ToString();
+
+            return new ApiResult(data: ip);
         }
 
         [HttpPost]
