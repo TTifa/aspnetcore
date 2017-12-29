@@ -1,5 +1,6 @@
 ﻿using aspnetcore.Middleware;
 using Entity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Redis;
@@ -8,7 +9,7 @@ using System.Linq;
 
 namespace aspnetcore.Controllers
 {
-    public class AccountController : Controller
+    public class AccountController : BaseController
     {
         private TtifaContext db;
         private RedisClient _redisCli;
@@ -45,12 +46,25 @@ namespace aspnetcore.Controllers
             };
             var tokenString = TokenHandler.WriteToken(token);
 
+            HttpContext.Response.Cookies.Append("access_token", tokenString);
+
             return new ApiResult(data: new
             {
                 user.Uid,
                 user.Username,
                 Token = tokenString
             });
+        }
+
+        [Authorize]
+        public ApiResult SignOut()
+        {
+            //token 过期
+            TokenHandler.Expire(CurrentUser.Token);
+            //删除cookie
+            HttpContext.Response.Cookies.Delete("access_token");
+
+            return new ApiResult();
         }
 
         #region jwt token

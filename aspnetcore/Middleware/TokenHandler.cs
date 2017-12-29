@@ -50,6 +50,12 @@ namespace aspnetcore.Middleware
                 {
                     token = Request.Headers["access_token"].FirstOrDefault();
 
+                    //get from cookie
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        Request.Cookies.TryGetValue("access_token", out token);
+                    }
+
                     // If no token found, no further work possible
                     if (string.IsNullOrEmpty(token))
                     {
@@ -119,6 +125,14 @@ namespace aspnetcore.Middleware
             return token.Guid;
         }
 
+        public static bool Expire(string guid)
+        {
+            var redis = new RedisClient().GetDatabase();
+            var tokenKey = $"UserToken:{guid}";
+
+            return redis.KeyDelete(tokenKey);
+        }
+
         /// <summary>
         /// get userinfo by token
         /// </summary>
@@ -143,6 +157,7 @@ namespace aspnetcore.Middleware
             }
 
             var claimIdentity = new ClaimsIdentity("token");
+            claimIdentity.AddClaim(new Claim(JwtClaimTypes.JwtId, token));
             claimIdentity.AddClaim(new Claim(JwtClaimTypes.Id, dict["Uid"]));
             claimIdentity.AddClaim(new Claim(JwtClaimTypes.Expiration, dict["ExpiredTime"]));
             claimIdentity.AddClaim(new Claim(JwtClaimTypes.Name, dict["Username"]));

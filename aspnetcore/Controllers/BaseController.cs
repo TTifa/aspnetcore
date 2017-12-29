@@ -17,6 +17,7 @@ namespace aspnetcore.Controllers
             if (principal.Identity != null && principal.Identity.IsAuthenticated)
             {
                 CurrentUser = new LoginedUser();
+                CurrentUser.Token = principal.FindFirstValue(JwtClaimTypes.JwtId);
                 CurrentUser.Uid = Convert.ToInt32(principal.FindFirstValue(JwtClaimTypes.Id));
                 CurrentUser.Username = principal.FindFirstValue(JwtClaimTypes.Name);
                 CurrentUser.ExpiredTime = Convert.ToDateTime(principal.FindFirstValue(JwtClaimTypes.Expiration));

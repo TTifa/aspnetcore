@@ -9,5 +9,6 @@ namespace Entity
         public int Uid { get; set; }
         public string Username { get; set; }
         public DateTime ExpiredTime { get; set; }
+        public string Token { get; set; }
     }
 }
