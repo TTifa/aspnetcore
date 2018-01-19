@@ -4,17 +4,29 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using aspnetcore.Filters;
+using Entity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Cors;
 
 namespace aspnetcore.Controllers
 {
     [Route("api/[controller]")]
-    public class ValuesController : Controller
+    [EnableCors("local")]
+    public class ArticleController : Controller
     {
+        private TtifaContext _db;
+        public ArticleController(TtifaContext db)
+        {
+            _db = db;
+        }
+
         // GET api/values
         [HttpGet, Log]
-        public IEnumerable<string> Get()
+        public ApiResult Get()
         {
-            return new string[] { "value1", "value2" };
+            var articles = _db.articles.OrderBy(o => o.Id).AsNoTracking().ToList();
+
+            return new ApiResult(data: articles);
         }
 
         // GET api/values/5
@@ -38,6 +50,7 @@ namespace aspnetcore.Controllers
 
         // DELETE api/values/5
         [HttpDelete("{id}")]
+        [DisableCors]
         public void Delete(int id)
         {
         }

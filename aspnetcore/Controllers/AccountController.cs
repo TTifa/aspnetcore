@@ -11,12 +11,12 @@ namespace aspnetcore.Controllers
 {
     public class AccountController : BaseController
     {
-        private TtifaContext db;
+        private TtifaContext _db;
         private RedisClient _redisCli;
 
         public AccountController(TtifaContext ttifaContext, RedisClient redisClient)
         {
-            db = ttifaContext;
+            _db = ttifaContext;
             _redisCli = redisClient;
         }
 
@@ -29,13 +29,13 @@ namespace aspnetcore.Controllers
         [HttpPost]
         public ApiResult SignIn(string username, string password)
         {
-            var user = db.users.FirstOrDefault(o => o.Username == username && o.Pwd == password);
+            var user = _db.users.FirstOrDefault(o => o.Username == username && o.Pwd == password);
             if (user == null)
                 return new ApiResult(ApiStatus.Fail);
 
             user.LastLoginTime = DateTime.Now;
             user.LastLoginIP = HttpContext.Connection.RemoteIpAddress.ToString();
-            db.SaveChanges();
+            _db.SaveChanges();
 
             var token = new ApiToken
             {

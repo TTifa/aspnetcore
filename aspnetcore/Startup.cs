@@ -25,7 +25,6 @@ namespace aspnetcore
             services.Configure<UploadOptions>(Configuration.GetSection("Upload"));
 
             services.AddDbContext<TtifaContext>(options => options.UseNpgsql(Configuration.GetConnectionString("Postgres")));
-
             services.AddSingleton(new RedisClient(Configuration.GetConnectionString("Redis")));
 
             //services.Configure<ForwardedHeadersOptions>(option => { option.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForward‌​edFor; });
@@ -80,6 +79,17 @@ namespace aspnetcore
             });
             */
             #endregion
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("local", builder =>
+                {
+                    builder.WithOrigins("http://localhost")
+                    .AllowAnyHeader()
+                    .WithMethods("GET", "POST")
+                    .AllowCredentials();//允许读取凭据（cookie等）
+                });
+            });
 
             //自定义登录验证
             services.AddAuthentication(options =>
@@ -138,6 +148,7 @@ namespace aspnetcore
                 c.DocExpansion("none");
             });
             */
+            //app.UseCors("local");//全局允许跨域
             app.UseAuthentication();
             app.UseMvc(routes => routes.MapRoute("default", "{controller=Home}/{action=Index}/{id?}"));
         }
