@@ -45,6 +45,8 @@ namespace aspnetcore.Filters
                         result = JsonConvert.SerializeObject(filterContext.Result); break;
                     case "ObjectResult":
                         result = JsonConvert.SerializeObject((filterContext.Result as ObjectResult).Value); break;
+                    case "ContentResult":
+                        result = (filterContext.Result as ContentResult).Content; break;
                     default:
                         result = resultType; break;
                 }

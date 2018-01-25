@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Redis;
+using Senparc.Weixin.Threads;
 
 namespace aspnetcore
 {
@@ -23,6 +25,7 @@ namespace aspnetcore
         {
             //读取配置
             services.Configure<UploadOptions>(Configuration.GetSection("Upload"));
+            services.Configure<WechatOptions>(Configuration.GetSection("Wechat"));
 
             services.AddDbContext<TtifaContext>(options => options.UseNpgsql(Configuration.GetConnectionString("Postgres")));
             services.AddSingleton(new RedisClient(Configuration.GetConnectionString("Redis")));
@@ -80,6 +83,7 @@ namespace aspnetcore
             */
             #endregion
 
+            /*
             services.AddCors(options =>
             {
                 options.AddPolicy("local", builder =>
@@ -90,6 +94,7 @@ namespace aspnetcore
                     .AllowCredentials();//允许读取凭据（cookie等）
                 });
             });
+            */
 
             //自定义登录验证
             services.AddAuthentication(options =>
@@ -101,11 +106,11 @@ namespace aspnetcore
             {
                 options.Events = new TokenEvents()
                 {
-                    //OnAuthenticationFailed = c =>
-                    //{
-                    //    c.NoResult();
-                    //    return new ApiResult(ApiStatus.NoLogin, c.Exception.Message).ExecuteApiResultAsync(c.HttpContext);
-                    //}
+                    OnAuthenticationFailed = context =>
+                    {
+                        context.NoResult();
+                        return new ApiResult(ApiStatus.NoLogin, context.Exception.Message).ExecuteApiResultAsync(context.HttpContext);
+                    }
                 };
             });
 
@@ -118,7 +123,7 @@ namespace aspnetcore
 
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IOptions<WechatOptions> wechatOptions)
         {
             if (env.IsDevelopment())
             {
@@ -136,7 +141,7 @@ namespace aspnetcore
 
             //400、500错误页面
             //app.UseStatusCodePagesWithRedirects("~/error/{0}");//客户端跳转
-            //app.UseStatusCodePagesWithReExecute("/Home/Error", "?code={0}");//服务端跳转
+            app.UseStatusCodePagesWithReExecute("/Home/Error", "?code={0}");//服务端跳转
 
             app.UseStaticFiles();
 
@@ -151,6 +156,16 @@ namespace aspnetcore
             //app.UseCors("local");//全局允许跨域
             app.UseAuthentication();
             app.UseMvc(routes => routes.MapRoute("default", "{controller=Home}/{action=Index}/{id?}"));
+
+            RegisterWechatThreads();//激活微信缓存及队列线程（必须）
+        }
+
+        /// <summary>
+        /// 激活微信缓存
+        /// </summary>
+        private void RegisterWechatThreads()
+        {
+            ThreadUtility.Register();//如果不注册此线程，则AccessToken、JsTicket等都无法使用SDK自动储存和管理。
         }
     }
 }
