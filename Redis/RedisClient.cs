@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Redis
 {
-    public class RedisClient
+    public partial class RedisClient
     {
         private static ConfigurationOptions _options;
         //延迟加载，Lazy<T> 对象初始化默认是线程安全的，多线程环境下，第一个访问 Lazy<T> 对象的 Value 属性的线程将初始化 Lazy<T> 对象，以后访问的线程都将使用第一次初始化的数据
@@ -120,133 +120,6 @@ namespace Redis
         private static void MuxerInternalError(object sender, InternalErrorEventArgs e)
         {
             //LogHelper.WriteInfoLog("InternalError:Message" + e.Exception.Message);
-        }
-        #endregion
-
-        #region kv
-        public string get(string key)
-        {
-            return GetDatabase().StringGet(key);
-        }
-
-        public bool set(string key, string value)
-        {
-            return GetDatabase().StringSet(key, value);
-        }
-
-        public long append(string key, string value)
-        {
-            return GetDatabase().StringAppend(key, value);
-        }
-
-        public long incr(string key, long value)
-        {
-            return GetDatabase().StringIncrement(key, value);
-        }
-
-        public double incr(string key, double value)
-        {
-            return GetDatabase().StringIncrement(key, value);
-        }
-
-        public bool del(string key)
-        {
-            return GetDatabase().KeyDelete(key);
-        }
-        #endregion
-
-        #region hash
-        public bool hdel(string key, string field)
-        {
-            return GetDatabase().HashDelete(key, field);
-        }
-
-        public bool exists(string key, string field)
-        {
-            return GetDatabase().HashExists(key, field);
-        }
-
-        public string hget(string key, string field)
-        {
-            return GetDatabase().HashGet(key, field);
-        }
-        public string[] hmget(string key, string[] fields)
-        {
-            var fieldArray = new RedisValue[fields.Length];
-            for (int i = 0; i < fields.Length; i++)
-            {
-                fieldArray[i] = fields[i];
-            }
-
-            return GetDatabase().HashGet(key, fieldArray).ToStringArray();
-        }
-
-        public bool hset(string key, string field, string value)
-        {
-            return GetDatabase().HashSet(key, field, value);
-        }
-
-        public void hmset(string key, List<KeyValuePair<string, string>> kvs)
-        {
-            var list = new List<HashEntry>();
-            foreach (var kv in kvs)
-            {
-                list.Add(new HashEntry(kv.Key, kv.Value));
-            }
-
-            GetDatabase().HashSet(key, list.ToArray());
-        }
-
-        public Dictionary<string, string> hgetall(string key)
-        {
-            return GetDatabase().HashGetAll(key).ToStringDictionary();
-        }
-
-        public long hincrby(string key, string field, long num)
-        {
-            return GetDatabase().HashIncrement(key, field, num);
-        }
-
-        public double hincrbyfloat(string key, string field, double num)
-        {
-            return GetDatabase().HashIncrement(key, field, num);
-        }
-
-        public string[] hkeys(string key)
-        {
-            return GetDatabase().HashKeys(key).ToStringArray();
-        }
-
-        public string[] hvals(string key)
-        {
-            return GetDatabase().HashValues(key).ToStringArray();
-        }
-
-        public long hlen(string key)
-        {
-            return GetDatabase().HashLength(key);
-        }
-        #endregion
-
-        #region set
-        public bool sadd(string key, string value)
-        {
-            return GetDatabase().SetAdd(key, value);
-        }
-
-        public long scard(string key)
-        {
-            return GetDatabase().SetLength(key);
-        }
-
-        public bool sismember(string key, string member)
-        {
-            return GetDatabase().SetContains(key, member);
-        }
-
-        public string[] smembers(string key)
-        {
-            return GetDatabase().SetMembers(key).ToStringArray();
         }
         #endregion
     }
