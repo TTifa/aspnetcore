@@ -16,8 +16,9 @@ namespace aspnetcore.Controllers
             return View();
         }
 
-        public IActionResult Error()
+        public IActionResult Error(string code)
         {
+            ViewBag.StatusCode = code;
             return View();
         }
     }

@@ -83,7 +83,7 @@ namespace aspnetcore
             */
             #endregion
 
-            /*
+            
             services.AddCors(options =>
             {
                 options.AddPolicy("local", builder =>
@@ -94,7 +94,7 @@ namespace aspnetcore
                     .AllowCredentials();//允许读取凭据（cookie等）
                 });
             });
-            */
+            
 
             //自定义登录验证
             services.AddAuthentication(options =>
@@ -153,7 +153,7 @@ namespace aspnetcore
                 c.DocExpansion("none");
             });
             */
-            //app.UseCors("local");//全局允许跨域
+            app.UseCors("local");
             app.UseAuthentication();
             app.UseMvc(routes => routes.MapRoute("default", "{controller=Home}/{action=Index}/{id?}"));
 

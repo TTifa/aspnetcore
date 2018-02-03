@@ -2,6 +2,7 @@
 using IdentityModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Redis;
 using System;
 using System.Security.Claims;
 
@@ -10,6 +11,14 @@ namespace aspnetcore.Controllers
     public class BaseController : Controller
     {
         protected LoginedUser CurrentUser { get; set; }
+        protected RedisClient _redisCli;
+        protected TtifaContext _db;
+        public BaseController(RedisClient redisCli, TtifaContext ttifaContext)
+        {
+            this._redisCli = redisCli;
+            this._db = ttifaContext;
+        }
+
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {

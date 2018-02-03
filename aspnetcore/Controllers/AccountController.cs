@@ -11,13 +11,8 @@ namespace aspnetcore.Controllers
 {
     public class AccountController : BaseController
     {
-        private TtifaContext _db;
-        private RedisClient _redisCli;
-
-        public AccountController(TtifaContext ttifaContext, RedisClient redisClient)
+        public AccountController(RedisClient redisCli, TtifaContext ttifaContext) : base(redisCli, ttifaContext)
         {
-            _db = ttifaContext;
-            _redisCli = redisClient;
         }
 
         [HttpGet]

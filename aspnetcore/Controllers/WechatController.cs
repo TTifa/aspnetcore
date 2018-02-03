@@ -89,5 +89,10 @@ namespace aspnetcore.Controllers
                 return Content(ex.Message);
             }
         }
+
+        public ApiResult JsApi()
+        {
+            return new ApiResult();
+        }
     }
 }
