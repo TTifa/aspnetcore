@@ -30,6 +30,39 @@ namespace aspnetcore.Controllers
             return new ApiResult(data: order);
         }
 
+        [HttpPost("list")]
+        public ApiResult List(int userId, int pageIndex, int pageSize, int status = -1)
+        {
+            var result = new ApiResult();
+            result.Page = new ApiResultPage(pageIndex, pageSize);
+
+            var source = _db.orders.Where(o => o.UserId == userId);
+            if (status > -1)
+            {
+                source = source.Where(o => o.State == (OrderStatus)status);
+            }
+
+            var total = source.Count();
+            result.Page.PageCount = total % pageSize == 0 ? (total / pageSize) : (total / pageSize + 1);
+            result.Page.Total = total;
+            var list = source.Skip((pageIndex - 1) * pageSize).Take(pageSize).AsNoTracking().ToList();
+
+            result.Data = list.Select(o => new
+            {
+                o.OrderId,
+                o.Amount,
+                o.Address,
+                o.CreateTime,
+                o.PayTime,
+                o.DeliveryTime,
+                o.ReceivedTime,
+                o.State,
+                Goods = _db.ordergoods.Where(g => g.OrderId == o.OrderId).AsNoTracking().ToList()
+            });
+
+            return result;
+        }
+
         [HttpPost]
         //public ApiResult Post(PlaceOrder model)
         public ApiResult Post(int userId, string items, string address)
@@ -60,7 +93,8 @@ namespace aspnetcore.Controllers
                     GoodsName = item.Name,
                     Quantity = goods[item.Id],
                     Price = item.Price,
-                    CreateTime = DateTime.Now
+                    CreateTime = DateTime.Now,
+                    Avatar = item.Avatar
                 };
                 totalAmount += orderGoods.Price * orderGoods.Quantity;
                 _db.ordergoods.Add(orderGoods);
