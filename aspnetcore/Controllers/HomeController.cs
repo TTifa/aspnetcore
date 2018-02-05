@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace aspnetcore.Controllers
 {
@@ -20,6 +21,12 @@ namespace aspnetcore.Controllers
         {
             ViewBag.StatusCode = code;
             return View();
+        }
+
+        [ResponseCache(CacheProfileName = "default")]
+        public ApiResult Time()
+        {
+            return new ApiResult(data: DateTime.Now.ToString("HH:mm:ss"));
         }
     }
 }

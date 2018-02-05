@@ -1,28 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Entity;
-using aspnetcore.Filters;
-using Senparc.Weixin.MP.Entities.Request;
-using Senparc.Weixin.MP;
-using System.IO;
-using System.Text;
+﻿using aspnetcore.Filters;
 using aspnetcore.Handlers;
+using Entity;
+using Microsoft.AspNetCore.Mvc;
+using Redis;
+using Senparc.Weixin.MP;
+using Senparc.Weixin.MP.AdvancedAPIs;
+using Senparc.Weixin.MP.Containers;
+using Senparc.Weixin.MP.Entities.Request;
+using System;
+using System.IO;
+using System.Linq;
+using System.Text;
 
 namespace aspnetcore.Controllers
 {
     [Produces("application/json")]
     [Route("api/[controller]")]
-    public class WechatsController : Controller
+    public class WechatsController : BaseController
     {
-        private TtifaContext _db;
-        public WechatsController(TtifaContext ttifaContext)
+        public WechatsController(RedisClient redisCli, TtifaContext ttifaContext) : base(redisCli, ttifaContext)
         {
-            _db = ttifaContext;
         }
+
 
         /*
         [HttpGet]
@@ -98,6 +97,53 @@ namespace aspnetcore.Controllers
 
                 return Content(ex.Message);
             }
+        }
+
+        /// <summary>
+        /// 生成二维码（缓存在redis中1分钟）
+        /// </summary>
+        /// <param name="id">微信账号id</param>
+        /// <param name="scene">场景值</param>
+        /// <param name="type">类型(默认为临时二维码)</param>
+        /// <returns></returns>
+        [HttpPost("qrcode")]
+        public ApiResult QRCode(int id, string scene, int type = 0)
+        {
+            var key = $"QRCode:{id}_{type}_{scene}";
+            var url = _redisCli.Get(key);
+            if (!string.IsNullOrEmpty(url))
+            {
+                return new ApiResult(data: url);
+            }
+
+            var wxAccount = GetAccountWithToken(id);
+            var sceneId = 0;
+            var qrType = (QrCode_ActionName)type;
+            if (qrType != QrCode_ActionName.QR_LIMIT_STR_SCENE && qrType != QrCode_ActionName.QR_STR_SCENE)
+            {
+                sceneId = Convert.ToInt32(scene);
+            }
+
+            var qrResult = QrCodeApi.Create(wxAccount.AccessToken, 100, sceneId, qrType, scene, 3600 * 1000);
+            url = QrCodeApi.GetShowQrCodeUrl(qrResult.ticket);
+            //save2redis
+            var redis = _redisCli.GetDatabase();
+            redis.StringSet($"QRCode:{id}_{type}_{scene}", url, new TimeSpan(0, 1, 0));
+
+            return new ApiResult(data: url);
+        }
+
+        private WechatAccount GetAccountWithToken(int id)
+        {
+            var wxAccount = _db.wechataccounts.FirstOrDefault(o => o.Id == id);
+            if (string.IsNullOrEmpty(wxAccount.AccessToken) || wxAccount.AccessTokenExpire < DateTime.Now)
+            {
+                wxAccount.AccessToken = AccessTokenContainer.TryGetAccessToken(wxAccount.AppId, wxAccount.AppSecret);
+                wxAccount.AccessTokenExpire = DateTime.Now.AddMinutes(110);//access token 有效期2小时
+                _db.wechataccounts.Update(wxAccount);
+            }
+
+            return wxAccount;
         }
     }
 }

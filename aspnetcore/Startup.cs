@@ -83,7 +83,7 @@ namespace aspnetcore
             */
             #endregion
 
-            
+
             services.AddCors(options =>
             {
                 options.AddPolicy("local", builder =>
@@ -94,7 +94,7 @@ namespace aspnetcore
                     .AllowCredentials();//允许读取凭据（cookie等）
                 });
             });
-            
+
 
             //自定义登录验证
             services.AddAuthentication(options =>
@@ -114,10 +114,15 @@ namespace aspnetcore
                 };
             });
 
-
+            services.AddResponseCaching();
             services.AddMvc(options =>
             {
                 //options.Filters.Add(new ApiExceptionAttribute());
+                options.CacheProfiles.Add("default", new Microsoft.AspNetCore.Mvc.CacheProfile
+                {
+                    Duration = 60,
+                    Location = Microsoft.AspNetCore.Mvc.ResponseCacheLocation.Any
+                });
             });
         }
 
@@ -156,7 +161,7 @@ namespace aspnetcore
             app.UseCors("local");
             app.UseAuthentication();
             app.UseMvc(routes => routes.MapRoute("default", "{controller=Home}/{action=Index}/{id?}"));
-
+            app.UseResponseCaching();
             RegisterWechatThreads();//激活微信缓存及队列线程（必须）
         }
 
