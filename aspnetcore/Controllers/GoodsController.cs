@@ -57,17 +57,21 @@ namespace aspnetcore.Controllers
         }
 
         [HttpPost]
-        public ApiResult List(int categoryId, int pageIndex = 1, int pageSize = 5)
+        public ApiResult List(int categoryId, int pageIndex = 1, int pageSize = 5, bool hot = false)
         {
             var result = new ApiResult();
             result.Page = new ApiResultPage(pageIndex, pageSize);
 
-            var source = _db.goods.Where(o => o.CategoryId == categoryId);
+            var source = _db.goods.AsQueryable();
+            if (categoryId > 0)
+                source = source.Where(o => o.CategoryId == categoryId);
+            if (hot)
+                source = source.Where(o => o.Hot == true);
 
             var total = source.Count();
             result.Page.PageCount = total % pageSize == 0 ? (total / pageSize) : (total / pageSize + 1);
             result.Page.Total = total;
-            var list = source.Skip((pageIndex - 1) * pageSize).Take(pageSize).AsNoTracking().ToList();
+            var list = source.OrderBy(o => o.OrderNo).Skip((pageIndex - 1) * pageSize).Take(pageSize).AsNoTracking().ToList();
             result.Data = list;
             return result;
         }

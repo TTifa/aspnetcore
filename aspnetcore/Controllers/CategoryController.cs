@@ -26,15 +26,5 @@ namespace aspnetcore.Controllers
 
             return new ApiResult(data: list);
         }
-
-        [HttpGet("banner")]
-        public ApiResult Banner(int id)
-        {
-            var banner = _db.ads.FirstOrDefault(o => o.Match == $"category:{id}" && o.State == AdState.enable);
-            if (banner == null)
-                return new ApiResult(ApiStatus.Fail, "get banner fail");
-
-            return new ApiResult(data: banner);
-        }
     }
 }

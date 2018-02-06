@@ -11,10 +11,7 @@ namespace Entity
         public string AppSecret { get; set; }
         public string Account { get; set; }
         public string Name { get; set; }
-        /// <summary>
-        /// 帐号类型(订阅号:10,服务号:20)
-        /// </summary>
-        public int AccountType { get; set; }
+        public WechatAccountType AccountType { get; set; }
         /// <summary>
         /// 消息加密模式(明文:10,兼容:20,安全:30)
         /// </summary>
@@ -24,6 +21,22 @@ namespace Entity
         public DateTime CreateTime { get; set; }
         public string AccessToken { get; set; }
         public DateTime AccessTokenExpire { get; set; }
+    }
+
+    public enum WechatAccountType
+    {
+        /// <summary>
+        /// 订阅号
+        /// </summary>
+        normal = 1,
+        /// <summary>
+        /// 服务号
+        /// </summary>
+        service,
+        /// <summary>
+        /// 小程序
+        /// </summary>
+        app
     }
 
     public enum WechatEncryptType

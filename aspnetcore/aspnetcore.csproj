@@ -19,6 +19,7 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.0.0" />
     <PackageReference Include="Qiniu.Shared" Version="7.2.15" />
     <PackageReference Include="Senparc.Weixin.MP" Version="14.8.12" />
+    <PackageReference Include="Senparc.Weixin.WxOpen" Version="1.8.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="1.1.0" />
   </ItemGroup>
 

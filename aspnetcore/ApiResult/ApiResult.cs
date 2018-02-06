@@ -157,6 +157,10 @@ namespace aspnetcore
         /// 未登录
         /// </summary>
         NoLogin,
+        /// <summary>
+        /// 未注册
+        /// </summary>
+        NoRegister = 11,
         NotFound = 404,
         BadRequest = 500
     }

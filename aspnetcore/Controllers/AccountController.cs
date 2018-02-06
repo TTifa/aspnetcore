@@ -62,6 +62,31 @@ namespace aspnetcore.Controllers
             return new ApiResult();
         }
 
+        public ApiResult Register(string username, string password)
+        {
+            var user = new User
+            {
+                Username = username,
+                Nickname = username,
+                Pwd = password,
+                Status = 1,
+                CreateTime = DateTime.Now,
+                Admin = false
+            };
+
+            _db.users.Add(user);
+            _db.SaveChanges();
+
+            return new ApiResult();
+        }
+
+        public ApiResult RegisterByWX()
+        {
+
+
+            return new ApiResult();
+        }
+
         #region jwt token
         /*
         [HttpPost]

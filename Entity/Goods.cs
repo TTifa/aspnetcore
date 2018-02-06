@@ -13,5 +13,9 @@ namespace Entity
         public string Avatar { get; set; }
         public string Images { get; set; }
         public string Detail { get; set; }
+        public int SalesVolume { get; set; }
+        public decimal PraiseRate { get; set; }
+        public bool Hot { get; set; }
+        public int OrderNo { get; set; }
     }
 }
