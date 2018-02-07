@@ -121,8 +121,15 @@ namespace aspnetcore.Middleware
             redis.HashSet(tokenKey, "Uid", token.Uid);
             redis.HashSet(tokenKey, "Username", token.Username);
             redis.HashSet(tokenKey, "ExpiredTime", token.ExpiredTime.ToString());
+            redis.KeyExpire(tokenKey, token.ExpiredTime);
 
             return token.Guid;
+        }
+
+        public static bool KeepToken(string tokenKey, DateTime expires)
+        {
+            var redis = new RedisClient().GetDatabase();
+            return redis.KeyExpire(tokenKey, expires);
         }
 
         public static bool Expire(string guid)

@@ -29,13 +29,16 @@ namespace aspnetcore.Controllers
             if (fans == null)
                 return new ApiResult(ApiStatus.Fail, "用户信息不存在");
 
+            if (fans.UserId > 0)
+                return new ApiResult(ApiStatus.Fail, "it's already existed");
+
             var user = new User
             {
                 Username = username,
                 Nickname = fans.NickName,
                 Pwd = password,
                 Status = 1,
-                LastLoginTime = DateTime.Now,
+                CreateTime = DateTime.Now,
                 Avatar = fans.Avatar,
                 Admin = false
             };
@@ -68,6 +71,25 @@ namespace aspnetcore.Controllers
         }
 
         /// <summary>
+        /// 获取用户openid
+        /// </summary>
+        /// <param name="id">公众号配置id</param>
+        /// <param name="jsCode"></param>
+        /// <returns></returns>
+        [HttpPost("openid")]
+        public ApiResult OpenId(int id, string jsCode)
+        {
+            var wxAccount = _db.wechataccounts.FirstOrDefault(o => o.Id == id);
+            var codeResult = SnsApi.JsCode2Json(wxAccount.AppId, wxAccount.AppSecret, jsCode);
+
+            //保存sessionkey
+            var redis = _redisCli.GetDatabase();
+            redis.StringSet($"WXSessionKey:{codeResult.openid}", codeResult.session_key, new TimeSpan(24, 0, 0));
+
+            return new ApiResult(data: codeResult.openid);
+        }
+
+        /// <summary>
         /// 小程序登录
         /// </summary>
         /// <param name="code"></param>
@@ -75,24 +97,20 @@ namespace aspnetcore.Controllers
         [HttpPost("signin")]
         public ApiResult SignIn(WechatUserInfo model)
         {
-            var wxAccount = _db.wechataccounts.FirstOrDefault(o => o.Id == model.WAId);
-            var codeResult = SnsApi.JsCode2Json(wxAccount.AppId, wxAccount.AppSecret, model.jsCode);
-            var fans = _db.wechatfans.FirstOrDefault(o => o.OpenId == codeResult.openid);
+            var fans = _db.wechatfans.FirstOrDefault(o => o.OpenId == model.openid);
             if (fans == null)
             {
                 //记录访客信息
                 fans = new WechatFans
                 {
-                    OpenId = codeResult.openid,
+                    OpenId = model.openid,
                     NickName = model.nickName,
                     Avatar = model.avatarUrl,
                     Sex = model.gender,
                     Area = $"{model.country}-{model.province}-{model.city}",
                     SubscribeTime = DateTime.Now,
                     State = FansStatus.Subscribe,
-                    WAId = model.WAId,
-                    SessionKey = codeResult.session_key,
-                    SessionExpire = DateTime.Now.AddDays(1) //sessionkey 保存一天
+                    WAId = model.WAId
                 };
 
                 _db.wechatfans.Add(fans);
@@ -101,9 +119,12 @@ namespace aspnetcore.Controllers
                 return new ApiResult(ApiStatus.NoRegister, "尚未注册账号");
             }
 
+            if (fans.UserId == null || fans.UserId < 0)
+                return new ApiResult(ApiStatus.NoRegister, "尚未注册账号");
+
             var user = _db.users.FirstOrDefault(o => o.Uid == fans.UserId);
             if (user == null)
-                return new ApiResult(ApiStatus.NoRegister, "尚未注册账号");
+                return new ApiResult(ApiStatus.Fail, "用户信息不存在");
 
             var token = new ApiToken
             {

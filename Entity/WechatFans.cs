@@ -15,8 +15,8 @@ namespace Entity
         public int? UserId { get; set; }
         public DateTime SubscribeTime { get; set; }
         public FansStatus State { get; set; }
-        public string SessionKey { get; set; }
-        public DateTime? SessionExpire { get; set; }
+        //public string SessionKey { get; set; }
+        //public DateTime? SessionExpire { get; set; }
         public int? Sex { get; set; }
     }
 

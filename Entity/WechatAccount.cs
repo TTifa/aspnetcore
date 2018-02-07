@@ -20,7 +20,7 @@ namespace Entity
         public string Token { get; set; }
         public DateTime CreateTime { get; set; }
         public string AccessToken { get; set; }
-        public DateTime AccessTokenExpire { get; set; }
+        public DateTime? AccessTokenExpire { get; set; }
     }
 
     public enum WechatAccountType
