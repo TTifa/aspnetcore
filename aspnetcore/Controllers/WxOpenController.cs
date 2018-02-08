@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Redis;
 using Senparc.Weixin.WxOpen.AdvancedAPIs.Sns;
 using aspnetcore.Middleware;
+using Infrastructure.Utils;
 
 namespace aspnetcore.Controllers
 {
@@ -141,6 +142,32 @@ namespace aspnetcore.Controllers
             {
                 UserId = user.Uid,
                 Token = tokenString
+            });
+        }
+
+        /// <summary>
+        /// 支付签名
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPost("paysign")]
+        public ApiResult PaySign(int id)
+        {
+            var wxAccount = _db.wechataccounts.FirstOrDefault(o => o.Id == id);
+            if (wxAccount == null)
+                return new ApiResult(ApiStatus.Fail, "获取公众号信息失败");
+
+            var timestamp = DateTime.UtcNow.Ticks.ToString();
+            var nonceStr = Guid.NewGuid().ToString("N");
+            var package = "prepay_id=" + CodeHelper.OrderNo(CodeHelper.CodeType.Null);
+            var paySign = CryptoHelper.MD5_Encrypt($"appId={wxAccount.AppId}&nonceStr={nonceStr}&package={package}&signType=MD5&timeStamp={timestamp}");
+
+            return new ApiResult(data: new
+            {
+                timeStamp = timestamp,
+                nonceStr = nonceStr,
+                package = package,
+                paySign = paySign
             });
         }
     }
