@@ -2,6 +2,10 @@
 @{
     ViewData["Title"] = "Bill";
 }
+@section header{
+    <link href="~/lib/datetimepicker/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+}
+
 <section class="content-header">
     <h1>
         账单
@@ -10,8 +14,16 @@
 <section class="content" id="app">
     <div class="box">
         <div class="box-body">
-            <div id="toolbar">
+            <div class="col-md-8">
                 <a class="btn btn-primary btn-sm" v-on:click="showEditing">新增</a>
+            </div>
+            <div class="col-md-4">
+                <div class="input-group">
+                    <input type='text' class="form-control" id="datepicker" />
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                </div>
             </div>
             <table class="table table-striped">
                 <thead>
@@ -24,8 +36,8 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="b in Bills" :key="b.Id">
-                        <td>{{b.Id}}</td>
+                    <tr v-for="(b,index) in Bills" :key="b.Id">
+                        <td>{{index}}</td>
                         <td>{{billDate(b.PayDate)}}</td>
                         <td>{{b.Amount}}</td>
                         <td>{{b.LogTime}}</td>
@@ -60,7 +72,17 @@
     <script src="~/js/app.js"></script>
     <script src="~/lib/Vue/vue.js"></script>
     <script src="~/js/extend.js"></script>
+    <script src="~/lib/datetimepicker/moment.min.js"></script>
+    <script src="~/lib/datetimepicker/bootstrap-datetimepicker.js"></script>
     <script>
+        $(function () {
+            $('#datepicker').datetimepicker({
+                format: "YYYY-MM-DD",
+            }).on('dp.change', function (date) {
+                console.log(date);
+            });
+        })
+
         var app = new Vue({
             el: '#app',
             data: {

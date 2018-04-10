@@ -32,7 +32,7 @@ namespace aspnetcore.Controllers
         public ApiResult Post([FromBody]Bill bill)
         {
             bill.LogTime = DateTime.Now;
-            bill.Id = CurrentUser.Uid;
+            bill.Uid = CurrentUser.Uid;
             _db.bills.Add(bill);
             _db.SaveChanges();
 
