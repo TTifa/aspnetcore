@@ -17,8 +17,21 @@ namespace aspnetcore.Controllers
             return View();
         }
 
+        public IActionResult Encode()
+        {
+            return View();
+        }
+
+        public IActionResult Bill()
+        {
+            return View();
+        }
+
         public IActionResult Error(string code)
         {
+            if (code == "401")
+                return Redirect("/Account/SignIn");
+
             ViewBag.StatusCode = code;
             return View();
         }

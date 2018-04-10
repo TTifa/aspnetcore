@@ -15,6 +15,12 @@ namespace aspnetcore.Controllers
         {
         }
 
+        [Authorize]
+        public IActionResult Index()
+        {
+            return View();
+        }
+
         [HttpGet]
         public IActionResult SignIn()
         {

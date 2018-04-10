@@ -18,6 +18,8 @@ namespace Entity
         public DbSet<OrderGoods> ordergoods { get; set; }
         public DbSet<Area> areas { get; set; }
         public DbSet<WechatFans> wechatfans { get; set; }
+        public DbSet<Bill> bills { get; set; }
+
 
         public TtifaContext(DbContextOptions<TtifaContext> options) : base(options)
         { }

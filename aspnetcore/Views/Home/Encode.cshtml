@@ -1,0 +1,52 @@
+﻿
+@{
+    ViewData["Title"] = "Encode";
+}
+<section class="content-header">
+    <h1>
+        Encode
+    </h1>
+</section>
+<section class="content" id="app">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            原文
+        </div>
+        <div class="panel-body">
+            <textarea class="form-control" v-model="Source" rows="3"></textarea>
+        </div>
+    </div>
+    <p>
+        <button type="button" class="btn btn-primary" v-on:click="urlEncode">UrlEncode编码</button>
+        <button type="button" class="btn btn-primary" v-on:click="urlDecode">UrlEncode解码</button>
+    </p>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            编码后
+        </div>
+        <div class="panel-body">
+            <textarea class="form-control" v-model="Text" rows="3"></textarea>
+        </div>
+    </div>
+</section>
+
+@section footer{
+    <script src="~/lib/Vue/vue.js"></script>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                Source: '',
+                Text:''
+            },
+            methods: {
+                urlEncode: function () {
+                    this.Text = encodeURIComponent(this.Source);
+                },
+                urlDecode: function () {
+                    this.Text = decodeURIComponent(this.Source);
+                }
+            }
+        })
+    </script>
+}
