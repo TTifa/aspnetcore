@@ -2,10 +2,6 @@
 @{
     ViewData["Title"] = "Bill";
 }
-@section header{
-    <link href="~/lib/datetimepicker/bootstrap-datetimepicker.min.css" rel="stylesheet" />
-}
-
 <section class="content-header">
     <h1>
         账单
@@ -51,17 +47,20 @@
     </div>
     <div v-show="ShowEditing" class="box">
         <div class="box-body">
-            <div class="form-group">
-                <label for="PayDate">日期</label>
-                <input type="text" id="PayDate" class="form-control" style="width:600px;">
-            </div>
-            <div class="form-group">
-                <label for="txtAmount">金额</label>
-                <input type="text" id="txtAmount" v-model="Editing.Amount" class="form-control" style="width:600px;">
-            </div>
-            <div class="form-group">
-                <label for="txtRemark">备注</label>
-                <input type="text" id="txtRemark" v-model="Editing.Remark" class="form-control" style="width:600px;">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="PayDate">日期</label>
+                    <input type="text" id="PayDate" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="txtAmount">金额</label>
+                    <input type="text" id="txtAmount" v-model="Editing.Amount" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="txtRemark">备注</label>
+                    <textarea type="text" rows="3" id="txtRemark" v-model="Editing.Remark" class="form-control">
+                </textarea>
+                </div>
             </div>
         </div>
         <div class="box-footer">
@@ -159,8 +158,8 @@
                 }
             },
             created: function () {
+                this.Date = new Date().Format("yyyy-MM-dd");
                 this.getBills();
-                this.Date = $("#datepicker").val();;
                 this.getStatistic();
             }
         })
