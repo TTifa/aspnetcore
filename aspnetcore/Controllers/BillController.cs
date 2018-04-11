@@ -19,13 +19,25 @@ namespace aspnetcore.Controllers
         {
         }
 
-        public ApiResult Get(int pageIndex, int pageSize)
+        public ApiResult Get(int pageIndex, int pageSize, DateTime date)
         {
-            var source = _db.bills.Where(o => o.Uid == CurrentUser.Uid).OrderByDescending(o => o.Id);
+            var end = date.AddDays(1);
+            var source = _db.bills.Where(o => o.Uid == CurrentUser.Uid);
+            if (date > DateTime.MinValue)
+                source = source.Where(o => o.PayDate >= date && o.PayDate < end);
+
             var page = new ApiResultPage(pageIndex, pageSize);
-            var list = DataPage.GetPage(source, pageSize, pageIndex, ref page.PageCount, ref page.Total);
+            var list = DataPage.GetPage(source.OrderByDescending(o => o.PayDate), pageSize, pageIndex, ref page.PageCount, ref page.Total);
 
             return new ApiResult(data: list, page: page);
+        }
+
+        [HttpGet("Statistic")]
+        public ApiResult Statistic()
+        {
+            var total = _db.bills.Where(o => o.Uid == CurrentUser.Uid).Sum(o => o.Amount);
+
+            return new ApiResult(data: total);
         }
 
         [HttpPost]
