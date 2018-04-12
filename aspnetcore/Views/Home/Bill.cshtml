@@ -12,7 +12,7 @@
         <div class="box-body">
             <div class="col-md-8">
                 <a class="btn btn-primary btn-sm" v-on:click="showEditing">新增</a>
-                <span style="margin-left:10px">总计：{{Total}}</span>
+                <span style="margin-left:10px">合计：支出~{{Stat.outlay}} 收入~{{Stat.income}} 净支出~{{Stat.total}}</span>
             </div>
             <div class="col-md-2"></div>
             <div class="col-md-2">
@@ -106,7 +106,7 @@
             el: '#app',
             data: {
                 Bills: [],
-                Total: 0,
+                Stat: {},
                 Date: '',
                 Editing: {},
                 ShowEditing: false,
@@ -135,7 +135,7 @@
                     ApiClient.Get('/api/bill/Statistic', {},
                         function (e) {
                             if (e.status == 1) {
-                                $this.Total = e.data;
+                                $this.Stat = e.data;
                             } else
                                 alert(e.msg);
                         })

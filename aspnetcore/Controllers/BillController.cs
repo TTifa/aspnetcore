@@ -36,8 +36,15 @@ namespace aspnetcore.Controllers
         public ApiResult Statistic()
         {
             var total = _db.bills.Where(o => o.Uid == CurrentUser.Uid).Sum(o => o.Amount);
+            var outlay = _db.bills.Where(o => o.Uid == CurrentUser.Uid && o.Amount > 0).Sum(o => o.Amount);
+            var income = 0 - _db.bills.Where(o => o.Uid == CurrentUser.Uid && o.Amount < 0).Sum(o => o.Amount);
 
-            return new ApiResult(data: total);
+            return new ApiResult(data: new
+            {
+                total = total,
+                outlay = outlay,
+                income = income
+            });
         }
 
         [HttpPost]
