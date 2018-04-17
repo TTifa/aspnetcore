@@ -19,6 +19,9 @@
     <p>
         <button type="button" class="btn btn-primary" v-on:click="urlEncode">UrlEncode编码</button>
         <button type="button" class="btn btn-primary" v-on:click="urlDecode">UrlEncode解码</button>
+        <button type="button" class="btn btn-primary" v-on:click="base64Encode">Base64编码</button>
+        <button type="button" class="btn btn-primary" v-on:click="base64Decode">Base64解码</button>
+
     </p>
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -31,13 +34,14 @@
 </section>
 
 @section footer{
-    <script src="~/lib/Vue/vue.js"></script>
+    <script src="~/lib/Vue/vue.min.js"></script>
+    <script src="~/lib/base/base64.min.js"></script>
     <script>
         var app = new Vue({
             el: '#app',
             data: {
                 Source: '',
-                Text:''
+                Text: ''
             },
             methods: {
                 urlEncode: function () {
@@ -45,6 +49,12 @@
                 },
                 urlDecode: function () {
                     this.Text = decodeURIComponent(this.Source);
+                },
+                base64Encode: function () {
+                    this.Text = Base64.encode(this.Source);
+                },
+                base64Decode: function () {
+                    this.Text = Base64.decode(this.Source);
                 }
             }
         })
