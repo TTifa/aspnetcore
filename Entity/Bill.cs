@@ -10,7 +10,51 @@ namespace Entity
         public int Uid { get; set; }
         public DateTime PayDate { get; set; }
         public decimal Amount { get; set; }
+        public int FlowType { get; set; }
         public string Remark { get; set; }
         public DateTime? LogTime { get; set; }
     }
+
+    public enum FlowType
+    {
+        /*支出*/
+        /// <summary>
+        /// 食物
+        /// </summary>
+        Eating,
+        /// <summary>
+        /// 饮料
+        /// </summary>
+        Beverage,
+        /// <summary>
+        /// 充值
+        /// </summary>
+        Recharge,
+        /// <summary>
+        /// 游戏
+        /// </summary>
+        Game,
+        /// <summary>
+        /// 购物
+        /// </summary>
+        Shopping,
+        /// <summary>
+        /// 房租水电
+        /// </summary>
+        Rent,
+        /// <summary>
+        /// 其他
+        /// </summary>
+        Other,
+        /*收入*/
+        /// <summary>
+        /// 工资
+        /// </summary>
+        Salary = 101,
+        /// <summary>
+        /// 理财
+        /// </summary>
+        Finance
+    }
+
 }

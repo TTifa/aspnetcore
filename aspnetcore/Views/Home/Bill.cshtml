@@ -57,6 +57,12 @@
                     <input type="text" id="txtAmount" v-model="Editing.Amount" class="form-control">
                 </div>
                 <div class="form-group">
+                    <label for="txtAmount">类型</label>
+                    <select v-model="Editing.FlowType" class="form-control">
+                        <option v-for="(f,k) in FlowTypes" :value="k" >{{f}}</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label for="txtRemark">备注</label>
                     <textarea type="text" rows="3" id="txtRemark" v-model="Editing.Remark" class="form-control">
                 </textarea>
@@ -111,7 +117,15 @@
                 Editing: {},
                 ShowEditing: false,
                 PageIndex: 1,
-                PageSize: 10
+                PageSize: 10,
+                FlowTypes2: {
+                    'Eating': 0, 'Beverage': 1, 'Recharge': 2, 'Game': 3, 'Shopping': 4, 'Rent': 5, 'Other': 6,
+                    'Salary': 101, 'Finance': 102
+                },
+                FlowTypes: {
+                    '0': 'Eating', '1': 'Beverage','2': 'Recharge','3': 'Game','4':'Shopping','5': 'Rent','6': 'Other',
+                    '101':'Salary','102': 'Finance'
+                }
             },
             methods: {
                 getBills: function () {
