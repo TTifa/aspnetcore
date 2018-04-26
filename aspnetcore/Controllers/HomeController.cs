@@ -22,6 +22,7 @@ namespace aspnetcore.Controllers
             return View();
         }
 
+        [Authorize]
         public IActionResult Bill()
         {
             return View();

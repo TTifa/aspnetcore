@@ -19,9 +19,10 @@ namespace aspnetcore.Controllers
         {
         }
 
-        public ApiResult Get(int pageIndex, int pageSize, DateTime date)
+        public ApiResult Get(int pageIndex, int pageSize, int year, int month)
         {
-            var end = date.AddDays(1);
+            var date = new DateTime(year, month, 1);
+            var end = date.AddMonths(1);
             var source = _db.bills.Where(o => o.Uid == CurrentUser.Uid);
             if (date > DateTime.MinValue)
                 source = source.Where(o => o.PayDate >= date && o.PayDate < end);
