@@ -43,6 +43,10 @@ namespace Entity
         /// </summary>
         Rent,
         /// <summary>
+        /// 还贷
+        /// </summary>
+        Credit,
+        /// <summary>
         /// 其他
         /// </summary>
         Other,

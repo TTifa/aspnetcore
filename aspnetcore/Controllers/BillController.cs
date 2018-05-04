@@ -34,11 +34,15 @@ namespace aspnetcore.Controllers
         }
 
         [HttpGet("Statistic")]
-        public ApiResult Statistic()
+        public ApiResult Statistic(int year, int month)
         {
-            var total = _db.bills.Where(o => o.Uid == CurrentUser.Uid).Sum(o => o.Amount);
-            var outlay = _db.bills.Where(o => o.Uid == CurrentUser.Uid && o.Amount > 0).Sum(o => o.Amount);
-            var income = 0 - _db.bills.Where(o => o.Uid == CurrentUser.Uid && o.Amount < 0).Sum(o => o.Amount);
+            var date = new DateTime(year, month, 1);
+            var end = date.AddMonths(1);
+            var query = _db.bills.Where(o => o.Uid == CurrentUser.Uid && o.PayDate >= date && o.PayDate < end);
+
+            var total = query.Sum(o => o.Amount);
+            var outlay = query.Where(o => o.Amount > 0).Sum(o => o.Amount);
+            var income = 0 - query.Where(o => o.Amount < 0).Sum(o => o.Amount);
 
             return new ApiResult(data: new
             {

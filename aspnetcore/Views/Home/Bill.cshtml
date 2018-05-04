@@ -3,7 +3,8 @@
     ViewData["Title"] = "Bill";
 }
 @section header{
-<link href="~/lib/iview/iview.css" rel="stylesheet" />
+    <link href="~/lib/iview/iview.css" rel="stylesheet" />
+    <link href="~/lib/datepicker/datepicker3.css" rel="stylesheet" />
 }
 <section class="content-header">
     <h1>
@@ -15,12 +16,12 @@
         <div class="box-body">
             <div class="col-md-8">
                 <a class="btn btn-primary btn-sm" v-on:click="showEditing">新增</a>
-                <span style="margin-left:10px">合计：支出~{{Stat.outlay}} 收入~{{Stat.income}} 净支出~{{Stat.total}}</span>
+                <span style="margin-left:10px">本月合计：支出~{{Stat.outlay}} 收入~{{Stat.income}} 净支出~{{Stat.total}}</span>
             </div>
             <div class="col-md-2"></div>
             <div class="col-md-2">
                 <div class="input-group">
-                    <input type='text' class="form-control" id="datepicker" />
+                    <input type="text" class="form-control" id="datepicker" />
                     <span class="input-group-addon">
                         <span class="glyphicon glyphicon-calendar"></span>
                     </span>
@@ -86,6 +87,7 @@
     <script src="~/lib/Vue/vue.js"></script>
     <script src="~/js/extend.js"></script>
     <script src="~/lib/datepicker/bootstrap-datepicker.js"></script>
+    <script src="~/lib/datepicker/locales/bootstrap-datepicker.zh-CN.js"></script>
     <script src="~/lib/iview/iview.js"></script>
     <script>
         $(function () {
@@ -93,12 +95,14 @@
             $('#datepicker').val(today.Format("yyyy-MM")).datepicker({
                 language: "zh-CN",
                 format: "yyyy-mm",
+                minViewMode: 1,
                 clearBtn: true,
                 autoclose: true,
                 todayBtn: false,
                 todayHighlight: true
             }).on("changeDate", function (e) {
                 app.Date = $("#datepicker").val();
+                if (!app.Date) return;
                 app.getBills();
                 app.getStatistic();
             });
@@ -117,7 +121,7 @@
 
         var app = new Vue({
             el: '#app',
-            
+
             data: {
                 Bills: [],
                 Stat: {},
@@ -158,13 +162,15 @@
                 },
                 getStatistic: function () {
                     var $this = this;
-                    ApiClient.Get('/api/bill/Statistic', {},
-                        function (e) {
-                            if (e.status == 1) {
-                                $this.Stat = e.data;
-                            } else
-                                alert(e.msg);
-                        })
+                    ApiClient.Get('/api/bill/Statistic', {
+                        year: this.Date.substr(0, 4),
+                        month: this.Date.substr(5, 2)
+                    }, function (e) {
+                        if (e.status == 1) {
+                            $this.Stat = e.data;
+                        } else
+                            alert(e.msg);
+                    })
                 },
                 jumpPage: function (page) {
                     this.Page.Index = page;
