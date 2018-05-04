@@ -19,7 +19,7 @@ namespace Entity
         public DbSet<Area> areas { get; set; }
         public DbSet<WechatFans> wechatfans { get; set; }
         public DbSet<Bill> bills { get; set; }
-
+        public DbSet<UploadLog> uploadlogs { get; set; }
 
         public TtifaContext(DbContextOptions<TtifaContext> options) : base(options)
         { }

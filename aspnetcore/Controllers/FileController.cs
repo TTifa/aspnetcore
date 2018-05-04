@@ -17,9 +17,11 @@ namespace aspnetcore.Controllers
     {
         private readonly UploadOptions _uploadConfig;
         private readonly IHostingEnvironment _env;
+        private TtifaContext _db;
 
-        public FileController(IOptions<UploadOptions> config, IHostingEnvironment env)
+        public FileController(TtifaContext db, IOptions<UploadOptions> config, IHostingEnvironment env)
         {
+            this._db = db;
             this._uploadConfig = config.Value;
             _env = env;
         }
@@ -88,8 +90,18 @@ namespace aspnetcore.Controllers
                 if (upResult.Code != 200)
                     return new ApiResult(ApiStatus.Fail, upResult.Text);
 
-                urls.Add($"{domain}/{filename}");
+                var url = $"{domain}/{filename}";
+                urls.Add(url);
+
+                _db.uploadlogs.Add(new UploadLog
+                {
+                    Filename = file.FileName,
+                    URL = url,
+                    LogTime = DateTime.Now
+                });
             }
+
+            await _db.SaveChangesAsync();
 
             return new ApiResult(data: urls);
         }
