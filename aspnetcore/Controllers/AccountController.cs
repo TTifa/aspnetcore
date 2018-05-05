@@ -3,6 +3,7 @@ using Entity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Redis;
 using System;
 using System.Linq;
@@ -68,30 +69,51 @@ namespace aspnetcore.Controllers
             return new ApiResult();
         }
 
-        public ApiResult Register(string username, string password)
-        {
-            var user = new User
-            {
-                Username = username,
-                Nickname = username,
-                Pwd = password,
-                Status = 1,
-                CreateTime = DateTime.Now,
-                Admin = false
-            };
-
-            _db.users.Add(user);
-            _db.SaveChanges();
-
-            return new ApiResult();
-        }
-
         public ApiResult RegisterByWX()
         {
 
 
             return new ApiResult();
         }
+
+        #region 用户管理
+        public ApiResult Users(int pageindex, int pagesize)
+        {
+            var query = _db.users.AsNoTracking().OrderBy(o => o.Uid);
+            var page = new ApiResultPage(pageindex, pagesize);
+            var list = DataPage.GetPage(query, pagesize, pageindex, ref page.PageCount, ref page.Total);
+
+            return new ApiResult(ApiStatus.OK, "success", list, page);
+        }
+
+        public ApiResult NewUser([FromBody]User model)
+        {
+            model.CreateTime = DateTime.Now;
+            model.Status = UserStatus.Normal;
+            _db.users.Add(model);
+            _db.SaveChanges();
+
+            return new ApiResult();
+        }
+
+        public ApiResult Delete(int uid)
+        {
+            var model = _db.users.First(o => o.Uid == uid);
+            _db.Entry(model).State = EntityState.Deleted;
+            _db.SaveChanges();
+
+            return new ApiResult();
+        }
+
+        public ApiResult UpdatePwd(int uid, string newPwd)
+        {
+            var user = _db.users.First(o => o.Uid == uid);
+            user.Pwd = newPwd;
+            _db.SaveChanges();
+
+            return new ApiResult();
+        }
+        #endregion
 
         #region jwt token
         /*

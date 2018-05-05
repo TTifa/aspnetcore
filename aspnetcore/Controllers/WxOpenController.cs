@@ -38,7 +38,7 @@ namespace aspnetcore.Controllers
                 Username = username,
                 Nickname = fans.NickName,
                 Pwd = password,
-                Status = 1,
+                Status = UserStatus.Normal,
                 CreateTime = DateTime.Now,
                 Avatar = fans.Avatar,
                 Admin = false

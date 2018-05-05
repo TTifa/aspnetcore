@@ -3,7 +3,7 @@
     ViewBag.Title = "Account";
 }
 @section header{
-    <link href="~/Content/datatable/dataTables.bootstrap.css" rel="stylesheet" />
+    <link href="~/lib/iview/iview.css" rel="stylesheet" />
 }
 <section class="content-header">
     <h1>
@@ -16,13 +16,13 @@
         <li class="active">Account</li>
     </ol>
 </section>
-<section class="content">
+<section class="content" id="app">
     <div class="box">
         <div class="box-body">
             <div id="toolbar">
-                <a onclick="javascript:$('#div_newuser').show();" class="btn btn-primary btn-sm">新增账号</a>
+                <a @@click="newUser" class="btn btn-primary btn-sm">新增账号</a>
             </div>
-            <table id="userlist" class="table table-bordered table-striped">
+            <table class="table table-striped">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -34,23 +34,27 @@
                         <th>Operate</th>
                     </tr>
                 </thead>
-                <tbody></tbody>
-                <tfoot>
-                    <tr>
-                        <th>ID</th>
-                        <th>UserName</th>
-                        <th>NickName</th>
-                        <th>LastLoginTime</th>
-                        <th>LastLoginIP</th>
-                        <th>Status</th>
-                        <th>Operate</th>
+                <tbody>
+                    <tr v-for="r in Rows" :key="r.Uid">
+                        <th>{{r.Uid}}</th>
+                        <th>{{r.Username}}</th>
+                        <th>{{r.Nickname}}</th>
+                        <th>{{r.LastLoginTime}}</th>
+                        <th>{{r.LastLoginIP}}</th>
+                        <th>{{r.Status}}</th>
+                        <th>
+                            <a v-on:click="showUpdatePwd(r.Uid)" class="btn btn-primary btn-xs">修改密码</a>&nbsp;
+                            <a v-on:click="deleteUser(r.Uid,r.Nickname)" class="btn btn-danger btn-xs">删除</a>
+                        </th>
                     </tr>
-                </tfoot>
+                </tbody>
             </table>
+            <div id="pager">
+                <Page :total="Page.Total" size="small" :current="Page.Index" :page-size="Page.Size" @@on-change="jumpPage" show-total></Page>
+            </div>
         </div>
-        <!-- /.box-body -->
     </div>
-    <div id="div_newuser" class="row" style="display:none">
+    <div class="row" v-show="ShowEdit">
         <div class="col-md-12">
             <div class="box box-primary">
                 <div class="box-header">
@@ -60,215 +64,147 @@
                     <div class="box-body">
                         <div class="input-group">
                             <span class="input-group-addon">账号</span>
-                            <input type="text" id="new_username" class="form-control" style="width:600px;" placeholder="请输入登录账号">
+                            <input type="text" v-model="Editing.Username" class="form-control" style="width:600px;" placeholder="请输入登录账号">
                             <span class="badge bg-red">*建议为英文</span>
                         </div>
                         <div class="input-group">
                             <span class="input-group-addon">昵称</span>
-                            <input type="text" id="new_nickname" class="form-control" style="width:600px;" placeholder="请输入显示名称">
+                            <input type="text" v-model="Editing.Nickname" class="form-control" style="width:600px;" placeholder="请输入显示名称">
                         </div>
                         <div class="input-group">
                             <span class="input-group-addon">密码</span>
-                            <input type="password" id="new_password" class="form-control" style="width:600px;" placeholder="请输入登录密码">
+                            <input type="password" v-model="Editing.Pwd" class="form-control" style="width:600px;" placeholder="请输入登录密码">
                         </div>
                     </div>
                     <div class="box-footer">
-                        <a id="btnSaveAccount" href="javascript:void(0);" class="btn btn-primary">添加</a>
-                        <a id="btnHideDiv" href="javascript:void(0)" class="btn btn-primary">取消</a>
+                        <a id="btnSaveAccount" @@click="addUser" class="btn btn-primary">添加</a>
+                        <a id="btnHideDiv" @@click="ShowEdit=false" class="btn btn-primary">取消</a>
                     </div>
                 </form>
             </div><!-- /.box -->
         </div>
     </div>
+    <div class="modal fade" id="updatepwd" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title" id="myModalLabel">修改密码</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group col-md-8" >
+                        <span class="input-group-addon" data-id="">输入新密码</span>
+                        <input type="password" id="newpass" v-model="UpdatePwd.newPwd" class="form-control">
+                    </div>
+                    <div class="input-group col-md-8" style="margin-top:10px">
+                        <span class="input-group-addon">确认新密码</span>
+                        <input type="password" v-model="UpdatePwd.repeat" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" @@click="resetPwd" class="btn btn-primary">提交更改</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>
-<div class="modal fade" id="updatepwd" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                <h4 class="modal-title" id="myModalLabel">修改密码</h4>
-            </div>
-            <div class="modal-body">
-                <div class="input-group">
-                    <span class="input-group-addon" id="updateid" data-id="">输入新密码</span>
-                    <input type="password" id="newpass" name="newpass" class="form-control">
-                </div>
-                <div class="input-group">
-                    <span class="input-group-addon">确认新密码</span>
-                    <input type="password" id="repeat" class="form-control">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                <button type="button" id="btnsubmit" class="btn btn-primary">提交更改</button>
-            </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div>
 
-@*<script src="~/Content/datatable/jquery.dataTables.min.js"></script>*@
-<script src="~/Content/datatable/jquery.dataTables.js"></script>
-<script src="~/Content/datatable/dataTables.bootstrap.min.js"></script>
+
+<script src="~/js/app.js"></script>
+<script src="~/lib/Vue/vue.js"></script>
+<script src="~/lib/iview/iview.js"></script>
+<script src="~/js/md5.js"></script>
 <script>
-    $(function () {
-        var table = $("#userlist").DataTable({
-            lengthChange: false,//分页大小调整
-            searching: false,
-            pageLength: 10,//分页大小
-            ordering: false,
-            serverSide: true,  //启用服务器端分页
-            order: [],  //取消默认排序查询,否则复选框一列会出现小箭头
-            ajax: function (data, callback, settings) {
-                //封装请求参数
-                var param = {};
-                param.pagesize = data.length;//页面显示记录条数，在页面显示每页显示多少项的时候
-                param.pageindex = (data.start / data.length) + 1;//当前页码
-                //ajax请求数据
-                $.ajax({
-                    type: "Post",
-                    url: "/Account/Users",
-                    cache: false,  //禁用缓存
-                    data: param,
-                    dataType: "json",
-                    success: function (result) {
-                        console.log(JSON.stringify(result));
-                        if (result.status != 1)
-                            alert(result.msg || '获取失败');
-
-                        //封装返回数据
-                        var returnData = {};
-                        returnData.draw = data.draw;//这里直接自行返回了draw计数器,应该由后台返回
-                        returnData.recordsTotal = result.page.total;//返回数据全部记录
-                        returnData.recordsFiltered = result.page.total;//后台不实现过滤功能，每次查询均视作全部结果
-                        returnData.data = result.data;//返回的数据列表
-                        //调用DataTables提供的callback方法，代表数据已封装完成并传回DataTables进行渲染
-                        //此时的数据需确保正确无误，异常判断应在执行此回调前自行处理完毕
-                        callback(returnData);
-                    }
-                });
+    var app = new Vue({
+        el: '#app',
+        data: {
+            Rows: [],
+            Page: {
+                Index: 1,
+                Size: 10,
+                Count: 0,
+                Total: 0
             },
-            columns: [
-                { "data": "Id" },
-                { "data": "UserName" },
-                { "data": "NickName" },
-                { "data": "LastLoginTime" },
-                { "data": "LastLoginIP" },
-                {
-                    "data": function (rowData, type, set, meta) {
-                        rowData.Status = rowData.UserStatus == 1 ? '正常' : '限制';
-                        return rowData.Status;
-                    }
-                },
-                {
-                    "data": function (rowData, type, set, meta) {
-                        var btn = '<a href="javascript:update(' + rowData.Id + ')">更新密码</a>';
-                        var setstate = rowData.UserStatus == 1 ? -1 : 1;
-                        var operate = rowData.UserStatus == 1 ? '禁用' : '启用';
-                        btn += '&nbsp;|&nbsp;<a href="javascript:setStatus(' + rowData.Id + ',' + setstate + ')">' + operate + '</a>';
-                        btn += '&nbsp;|&nbsp;<a href="javascript:deleteUser(' + rowData.Id + ')">删除</a>';
-                        return btn;
-                    }
-                },
-            ]
-        });
-        $('#btnsubmit').bind('click', udpatePass);
-        $('#btnSaveAccount').bind('click', saveAccount);
-        $('#btnHideDiv').bind('click', function () {
-            $('#div_newuser').find('input').val('');
-            $('#div_newuser').hide();
-        });
-    })
-    function reload() {
-        //table.ajax.reload();//分页重置
-        table.ajax.reload(null, false);//分页信息保留
-    }
-    function update(id) {
-        $('#updateid').attr('data-id', id);
-        $('#updatepwd').modal();
-    }
-    function saveAccount() {
-        var model = {
-            UserName: $('#new_username').val().trim(),
-            NickName: $('#new_nickname').val().trim(),
-            Password: $('#new_password').val().trim()
-        };
-        if (!model.UserName) { alert('请输入用户名'); return; }
-        if (!model.NickName) { alert('请输入显示名称'); return; }
-        if (!model.Password) { alert('请输入密码'); return; }
-        $.ajax({
-            url: '/Account/Register',
-            type: 'post',
-            data: model,
-            dataType: "json",
-            success: function (e) {
-                if (e.status == 1) {
-                    alert('新增成功');
-                    reload();
-                } else {
-                    alert(e.msg || '更新失败');
-                }
-            }
-        })
-    }
-    function udpatePass() {
-        var pass = $('#newpass').val();
-        if (!pass || pass.length < 1) {
-            alert('请输入密码'); return
-        }
-        $.ajax({
-            url: '/Account/UpdatePassword',
-            type: 'post',
-            data: {
-                id: $('#updateid').attr('data-id'),
-                pwd: pass
-            },
-            dataType: "json",
-            success: function (e) {
-                if (e.status == 1) {
-                    alert('更新成功');
-                } else {
-                    alert(e.msg || '更新失败');
-                }
-            }
-        })
-    }
-    function deleteUser() {
-        if (confirm('确认删除该用户?')) {
-            $.ajax({
-                url: '/Account/UpdatePassword',
-                type: 'post',
-                data: {
-                    id: $('#updateid').attr('data-id'),
-                    pwd: pass
-                },
-                dataType: "json",
-                success: function (e) {
+            ShowEdit: false,
+            Editing: {},
+            UpdatePwd: {}
+        },
+        methods: {
+            getData: function () {
+                var $this = this;
+                ApiClient.Get('/Account/Users', {
+                    pageindex: this.Page.Index,
+                    pagesize: this.Page.Size
+                }, function (e) {
                     if (e.status == 1) {
-                        alert('删除成功');
-                        reload();
-                    } else {
-                        alert(e.msg || '更新失败');
-                    }
-                }
-            })
-        }
-    }
-    function setStatus(id, state) {
-        $.ajax({
-            url: '/Account/SetStatus',
-            type: 'post',
-            data: {
-                id: id,
-                state: state
+                        $this.Rows = e.data;
+                        $this.Page.PageCount = e.page.count;
+                        $this.Page.Total = e.page.total;
+                    } else
+                        alert(e.msg);
+                })
             },
-            dataType: "json",
-            success: function (e) {
-                if (e.status == 1) {
-                    alert('更新成功');
-                } else {
-                    alert(e.msg || '更新失败');
+            jumpPage: function (page) {
+                this.Page.Index = page;
+                this.getData();
+            },
+            newUser: function () {
+                this.Editing = {};
+                this.ShowEdit = true;
+            },
+            showUpdatePwd: function (uid) {
+                this.UpdatePwd = {
+                    uid: uid,
+                    newPwd: '',
+                    repeat: ''
+                };
+                $("#updatepwd").modal();
+            },
+            addUser: function () {
+                var $this = this;
+                ApiClient.Post('/Account/NewUser', this.Editing, function (e) {
+                    if (e.status == 1) {
+                        alert('新增成功');
+                        $this.getData();
+                    } else
+                        alert(e.msg);
+                })
+            },
+            deleteUser: function (uid, nickname) {
+                var $this = this;
+                var ret = confirm(`确定删除用户[${nickname}]吗？`);
+                if (!ret) return;
+                ApiClient.Get('/Account/Delete', {
+                    uid: uid
+                }, function (e) {
+                    if (e.status == 1) {
+                        $this.getData();
+                    } else
+                        alert(e.msg);
+                })
+            },
+            resetPwd: function () {
+                var $this = this;
+                if (!this.UpdatePwd.uid || !this.UpdatePwd.newPwd) {
+                    alert('请输入新密码');
+                    return;
                 }
+                if (this.UpdatePwd.newPwd != this.UpdatePwd.repeat) {
+                    alert('2次输入密码不同');
+                    return;
+                }
+                ApiClient.Get('/Account/UpdatePwd', this.UpdatePwd, function (e) {
+                    if (e.status == 1) {
+                        alert('更新成功');
+                        $("#updatepwd").modal('hide');
+                    } else
+                        alert(e.msg || '更新失败');
+                })
             }
-        })
-    }
+        },
+        created: function () {
+            this.getData();
+        }
+    })
 </script>
