@@ -52,6 +52,14 @@ namespace aspnetcore.Controllers
             });
         }
 
+        [HttpGet("GetStat")]
+        public ApiResult GetStat(string month)
+        {
+            var stat = _redisCli.hgetall($"Stat:{month}");
+
+            return new ApiResult(data: stat);
+        }
+
         [HttpPost]
         public ApiResult Post([FromBody]Bill bill)
         {

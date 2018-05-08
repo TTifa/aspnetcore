@@ -1,0 +1,84 @@
+﻿
+@{
+    ViewData["Title"] = "Bill";
+}
+<section class="content-header">
+    <h1>
+        支出统计
+    </h1>
+</section>
+<section class="content">
+    <div id="main" style="width: 600px;height:400px;"></div>
+</section>
+<script src="~/js/app.js"></script>
+<script src="~/lib/echarts/echarts.js"></script>
+<script src="~/lib/Vue/vue.js"></script>
+<script>
+    var myChart = echarts.init(document.getElementById('main'));
+    var Types = ['Eating', 'Beverage', 'Recharge', 'Game', 'Shopping', 'Rent', 'Credit', 'Other', 'Salary', 'Finance'];
+    var SeriesData = [];
+    var Selected = {};
+    $(function () {
+        getStat();
+    })
+
+    function getStat() {
+        ApiClient.Get('/api/bill/getstat', {
+            month: '201804'
+        }, function (e) {
+            if (e.status == 1) {
+                var arr = new Array;
+                $.each(Types, function (i, key) {
+                    var value = e.data[key] || 0;
+                    Selected[key] = value > 0;
+                    arr.push({
+                        name: key,
+                        value: value
+                    });
+                })
+                SeriesData = arr;
+                genChart();
+            } else
+                alert(e.msg);
+        })
+    }
+
+    function genChart() {
+        var option = {
+            title: {
+                text: '4月支出统计',
+                x: 'center'
+            },
+            tooltip: {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
+            legend: {
+                type: 'scroll',
+                orient: 'vertical',
+                right: 10,
+                top: 20,
+                bottom: 20,
+                data: Types,
+                selected: Selected
+            },
+            series: [
+                {
+                    name: '类型',
+                    type: 'pie',
+                    radius: '55%',
+                    center: ['40%', '50%'],
+                    data: SeriesData,
+                    itemStyle: {
+                        emphasis: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }
+            ]
+        };
+        myChart.setOption(option);
+    }
+</script>
