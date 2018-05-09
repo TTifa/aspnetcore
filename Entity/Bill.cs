@@ -10,7 +10,7 @@ namespace Entity
         public int Uid { get; set; }
         public DateTime PayDate { get; set; }
         public decimal Amount { get; set; }
-        public int FlowType { get; set; }
+        public FlowType FlowType { get; set; }
         public string Remark { get; set; }
         public DateTime? LogTime { get; set; }
     }
