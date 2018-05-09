@@ -101,6 +101,7 @@
     <script src="~/lib/datepicker/locales/bootstrap-datepicker.zh-CN.js"></script>
     <script src="~/lib/iview/iview.js"></script>
     <script src="~/lib/echarts/echarts.js"></script>
+    <script src="~/lib/echarts/macarons.js"></script>
     <script>
         $(function () {
             var today = new Date();
@@ -171,6 +172,7 @@
                     })
                 },
                 getStatistic: function () {
+                    getStat(this.Date.replace('-', ''));
                     var $this = this;
                     ApiClient.Get('/api/bill/Statistic', {
                         year: this.Date.substr(0, 4),
@@ -178,7 +180,6 @@
                     }, function (e) {
                         if (e.status == 1) {
                             $this.Stat = e.data;
-                            getStat();
                         } else
                             alert(e.msg);
                     })
@@ -205,19 +206,19 @@
                 }
             },
             created: function () {
-                this.Date = new Date().Format("yyyy-MM-dd");
+                this.Date = new Date().Format("yyyy-MM");
                 this.getBills();
                 this.getStatistic();
             }
         })
     
-        var myChart = echarts.init(document.getElementById('main'));
+        var myChart = echarts.init(document.getElementById('main'),'macarons');
         var Types = ['Eating', 'Beverage', 'Recharge', 'Game', 'Shopping', 'Rent', 'Credit', 'Other', 'Salary', 'Finance'];
         var SeriesData = [];
         var Selected = {};
-        function getStat() {
-            ApiClient.Get('/api/bill/getstat', {
-                month: $("#datepicker").val().replace('-', '')
+        function getStat(month) {
+            ApiClient.Get('/api/bill/stat', {
+                month: month
             }, function (e) {
                 if (e.status == 1) {
                     var arr = new Array;
