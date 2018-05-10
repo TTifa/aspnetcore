@@ -26,12 +26,12 @@ namespace aspnetcore
             //读取配置
             services.Configure<UploadOptions>(Configuration.GetSection("Upload"));
             services.Configure<WechatOptions>(Configuration.GetSection("Wechat"));
+            services.Configure<SiteOptions>(Configuration.GetSection("Site"));
 
             services.AddDbContext<TtifaContext>(options => options.UseNpgsql(Configuration.GetConnectionString("Postgres")));
             services.AddSingleton(new RedisClient(Configuration.GetConnectionString("Redis")));
 
-            //services.Configure<ForwardedHeadersOptions>(option => { option.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForward‌​edFor; });
-
+            services.AddTimedJob();
             //注册swagger
             /*
             services.AddSwaggerGen(options =>
@@ -83,7 +83,6 @@ namespace aspnetcore
             */
             #endregion
 
-
             services.AddCors(options =>
             {
                 options.AddPolicy("local", builder =>
@@ -94,7 +93,6 @@ namespace aspnetcore
                     .AllowCredentials();//允许读取凭据（cookie等）
                 });
             });
-
 
             //自定义登录验证
             services.AddAuthentication(options =>
@@ -130,6 +128,7 @@ namespace aspnetcore
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, IOptions<WechatOptions> wechatOptions)
         {
+            app.UseTimedJob();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

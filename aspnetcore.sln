@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2005
+VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "aspnetcore", "aspnetcore\aspnetcore.csproj", "{5BBD5819-E4CA-4C2F-BCD8-2187327C72C4}"
 EndProject
@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Redis", "Redis\Redis.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Log", "Log\Log.csproj", "{3F8FA33A-6569-48DC-AEEF-0DF6E9AE0818}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{4F9132AF-944E-4B47-A51F-498D5072F4C9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{4F9132AF-944E-4B47-A51F-498D5072F4C9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Framework", "Framework", "{9658FEC1-D9D0-4481-84DE-9758C66406CA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,6 +44,12 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C4BCE58F-D8E1-4A32-9EAB-A9CA3C971B4F} = {9658FEC1-D9D0-4481-84DE-9758C66406CA}
+		{53D45433-089C-44D9-8AA8-4D1E46207434} = {9658FEC1-D9D0-4481-84DE-9758C66406CA}
+		{3F8FA33A-6569-48DC-AEEF-0DF6E9AE0818} = {9658FEC1-D9D0-4481-84DE-9758C66406CA}
+		{4F9132AF-944E-4B47-A51F-498D5072F4C9} = {9658FEC1-D9D0-4481-84DE-9758C66406CA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B15980E6-8B22-4623-8730-809C99ED2481}

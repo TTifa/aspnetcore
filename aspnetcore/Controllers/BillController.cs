@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Entity;
+﻿using Entity;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Redis;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace aspnetcore.Controllers
 {
@@ -65,7 +63,7 @@ namespace aspnetcore.Controllers
             });
         }
 
-        [HttpGet("GenStat")]
+        [HttpGet("GenStat"), AllowAnonymous]
         public ApiResult GenStat(DateTime date)
         {
             if (date == DateTime.MinValue)
@@ -73,16 +71,19 @@ namespace aspnetcore.Controllers
                 var today = DateTime.Now.Date;
                 date = new DateTime(today.Year, today.Month, 1);
             }
+            var userIds = _db.users.Where(o => o.Status == UserStatus.Normal).Select(o => o.Uid).ToList();
+            foreach (var uid in userIds)
+            {
+                var end = new DateTime(date.Year, date.Month + 1, 1);
+                var query = _db.bills.Where(o => o.Uid == uid && o.PayDate >= date && o.PayDate < end && o.Amount > 0);
+                var list = query.GroupBy(o => o.FlowType).Select(o =>
+                    new KeyValuePair<string, string>(o.Key.ToString(), o.Sum(b => b.Amount).ToString("0.00")))
+                    .ToList();
 
-            var end = new DateTime(date.Year, date.Month + 1, 1);
-            var query = _db.bills.Where(o => o.Uid == CurrentUser.Uid && o.PayDate >= date && o.PayDate < end && o.Amount > 0);
-            var list = query.GroupBy(o => o.FlowType).Select(o =>
-                new KeyValuePair<string, string>(o.Key.ToString(), o.Sum(b => b.Amount).ToString("0.00")))
-                .ToList();
+                _redisCli.Hmset($"Stat:{uid}:{date.ToString("yyyyMM")}", list);
+            }
 
-            _redisCli.Hmset($"Stat:{CurrentUser.Uid}:{date.ToString("yyyyMM")}", list);
-
-            return new ApiResult(data: list);
+            return new ApiResult();
         }
 
         [HttpGet("Stat")]
@@ -93,7 +94,7 @@ namespace aspnetcore.Controllers
             return new ApiResult(data: stat);
         }
 
-        [HttpGet("GenDailyStat")]
+        [HttpGet("GenDailyStat"), AllowAnonymous]
         public ApiResult GenDailyStat(DateTime date)
         {
             if (date == DateTime.MinValue)
@@ -102,27 +103,32 @@ namespace aspnetcore.Controllers
                 date = new DateTime(today.Year, today.Month, 1);
             }
 
-            var statKey = $"DailyStat:{CurrentUser.Uid}:{date.ToString("yyyyMM")}";
-            var end = new DateTime(date.Year, date.Month + 1, 1);
-            var query = _db.bills.Where(o => o.Uid == CurrentUser.Uid && o.PayDate >= date && o.PayDate < end && o.Amount > 0);
-            var list = query.GroupBy(o => o.PayDate).Select(o =>
-                new KeyValuePair<string, string>(o.Key.ToString("yyyyMMdd"), o.Sum(b => b.Amount).ToString("0.00")))
-                .ToList();
-
-            //补全没有记录日期
-            while (date < end)
+            var userIds = _db.users.Where(o => o.Status == UserStatus.Normal).Select(o => o.Uid).ToList();
+            foreach (var uid in userIds)
             {
-                var dateStr = date.ToString("yyyyMMdd");
-                if (!list.Any(o => o.Key == dateStr))
+                var statKey = $"DailyStat:{uid}:{date.ToString("yyyyMM")}";
+                var end = new DateTime(date.Year, date.Month + 1, 1);
+                var query = _db.bills.Where(o => o.Uid == uid && o.PayDate >= date && o.PayDate < end && o.Amount > 0);
+                var list = query.GroupBy(o => o.PayDate).Select(o =>
+                    new KeyValuePair<string, string>(o.Key.ToString("yyyyMMdd"), o.Sum(b => b.Amount).ToString("0.00")))
+                    .ToList();
+
+                //补全没有记录日期
+                var start = date;
+                while (start < end)
                 {
-                    list.Add(new KeyValuePair<string, string>(dateStr, "0"));
+                    var dateStr = start.ToString("yyyyMMdd");
+                    if (!list.Any(o => o.Key == dateStr))
+                    {
+                        list.Add(new KeyValuePair<string, string>(dateStr, "0"));
+                    }
+                    start = start.AddDays(1);
                 }
-                date = date.AddDays(1);
+
+                _redisCli.Hmset(statKey, list);
             }
 
-            _redisCli.Hmset(statKey, list);
-
-            return new ApiResult(data: list);
+            return new ApiResult();
         }
 
         [HttpGet("DailyStat")]
