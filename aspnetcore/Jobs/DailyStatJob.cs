@@ -17,7 +17,7 @@ namespace aspnetcore.Jobs
         /// <summary>
         /// 每隔1小时更新一次
         /// </summary>
-        [Invoke(Begin = "2018-05-10 15:00", Interval = 1000 * 3660, SkipWhileExecuting = true)]
+        [Invoke(Begin = "2018-05-10 16:00", Interval = 1000 * 3600, SkipWhileExecuting = true)]
         public void Generate()
         {
             var genDailyStat = $"{_options.Host}:{_options.Port}/Api/Bill/GenDailyStat";
