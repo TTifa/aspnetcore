@@ -147,7 +147,7 @@
                     Total: 0
                 },
                 FlowTypes: {
-                    '0': 'Eating', '1': 'Beverage', '2': 'Recharge', '3': 'Game', '4': 'Shopping', '5': 'Rent', '6': 'Credit', '7': 'Other',
+                    '0': 'Eating', '1': 'Beverage', '2': 'Traffic', '3': 'Game', '4': 'Shopping', '5': 'Rent', '6': 'Credit', '7': 'Communication', '100':'Other',
                     '101': 'Salary', '102': 'Finance'
                 }
             },
@@ -213,7 +213,7 @@
         })
     
         var myChart = echarts.init(document.getElementById('main'),'macarons');
-        var Types = ['Eating', 'Beverage', 'Recharge', 'Game', 'Shopping', 'Rent', 'Credit', 'Other', 'Salary', 'Finance'];
+        var Types = ['Eating', 'Beverage', 'Traffic', 'Game', 'Shopping', 'Rent', 'Credit','Communication', 'Other', 'Salary', 'Finance'];
         var SeriesData = [];
         var Selected = {};
         function getStat(month) {

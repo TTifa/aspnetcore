@@ -27,9 +27,9 @@ namespace Entity
         /// </summary>
         Beverage,
         /// <summary>
-        /// 充值
+        /// 交通
         /// </summary>
-        Recharge,
+        Traffic,
         /// <summary>
         /// 游戏
         /// </summary>
@@ -47,9 +47,13 @@ namespace Entity
         /// </summary>
         Credit,
         /// <summary>
+        /// 通讯
+        /// </summary>
+        Communication,
+        /// <summary>
         /// 其他
         /// </summary>
-        Other,
+        Other = 100,
         /*收入*/
         /// <summary>
         /// 工资
