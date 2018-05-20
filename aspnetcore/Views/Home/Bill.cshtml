@@ -16,12 +16,18 @@
         <div class="col-md-8" id="app">
             <div class="box">
                 <div class="box-body">
-                    <div class="col-md-8">
+                    <div class="col-md-6">
                         <a class="btn btn-primary btn-sm" v-on:click="showEditing">新增</a>
                         <span style="margin-left:10px">本月合计：支出~{{Stat.outlay}} 收入~{{Stat.income}} 净支出~{{Stat.total}}</span>
                     </div>
-                    <div class="col-md-2"></div>
-                    <div class="col-md-2">
+                    <div class="col-md-3">
+                        <div class="input-group">
+                            <select @@change="getBills" class="form-control" v-model="SelectFlowType">
+                                <option v-for="k,v in FlowTypes" :value="v">{{k}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
                         <div class="input-group">
                             <input type="text" class="form-control" id="datepicker" />
                             <span class="input-group-addon">
@@ -99,8 +105,8 @@
     <script src="~/js/extend.js"></script>
     <script src="~/lib/datepicker/bootstrap-datepicker.js"></script>
     <script src="~/lib/datepicker/locales/bootstrap-datepicker.zh-CN.js"></script>
-    <script src="~/lib/iview/iview.js"></script>
-    <script src="~/lib/echarts/echarts.js"></script>
+    <script src="~/lib/iview/iview.min.js"></script>
+    <script src="~/lib/echarts/echarts.min.js"></script>
     <script src="~/lib/echarts/macarons.js"></script>
     <script>
         $(function () {
@@ -139,6 +145,7 @@
                 Stat: {},
                 Date: '',
                 Editing: {},
+                SelectFlowType: -1,
                 ShowEditing: false,
                 Page: {
                     Index: 1,
@@ -147,7 +154,7 @@
                     Total: 0
                 },
                 FlowTypes: {
-                    '0': 'Eating', '1': 'Beverage', '2': 'Traffic', '3': 'Game', '4': 'Shopping', '5': 'Rent', '6': 'Credit', '7': 'Communication', '100':'Other',
+                    '0': 'Eating', '1': 'Beverage', '2': 'Traffic', '3': 'Game', '4': 'Shopping', '5': 'Rent', '6': 'Credit', '7': 'Communication', '100': 'Other',
                     '101': 'Salary', '102': 'Finance'
                 }
             },
@@ -157,6 +164,7 @@
                     var param = {
                         pageIndex: this.Page.Index,
                         pageSize: this.Page.Size,
+                        flowType: this.SelectFlowType
                     };
                     if (this.Date) {
                         param.year = this.Date.substr(0, 4);
@@ -211,9 +219,9 @@
                 this.getStatistic();
             }
         })
-    
-        var myChart = echarts.init(document.getElementById('main'),'macarons');
-        var Types = ['Eating', 'Beverage', 'Traffic', 'Game', 'Shopping', 'Rent', 'Credit','Communication', 'Other', 'Salary', 'Finance'];
+
+        var myChart = echarts.init(document.getElementById('main'), 'macarons');
+        var Types = ['Eating', 'Beverage', 'Traffic', 'Game', 'Shopping', 'Rent', 'Credit', 'Communication', 'Other', 'Salary', 'Finance'];
         var SeriesData = [];
         var Selected = {};
         function getStat(month) {

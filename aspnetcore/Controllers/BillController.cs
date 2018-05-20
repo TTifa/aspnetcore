@@ -17,13 +17,15 @@ namespace aspnetcore.Controllers
         {
         }
 
-        public ApiResult Get(int pageIndex, int pageSize, int year, int month)
+        public ApiResult Get(int pageIndex, int pageSize, int year, int month, FlowType flowType = FlowType.None)
         {
             var date = new DateTime(year, month, 1);
             var end = date.AddMonths(1);
             var source = _db.bills.Where(o => o.Uid == CurrentUser.Uid);
             if (date > DateTime.MinValue)
                 source = source.Where(o => o.PayDate >= date && o.PayDate < end);
+            if (flowType != FlowType.None)
+                source = source.Where(o => o.FlowType == flowType);
 
             var page = new ApiResultPage(pageIndex, pageSize);
             var list = DataPage.GetPage(source.OrderByDescending(o => o.PayDate), pageSize, pageIndex, ref page.PageCount, ref page.Total);
@@ -75,7 +77,7 @@ namespace aspnetcore.Controllers
             foreach (var uid in userIds)
             {
                 var end = new DateTime(date.Year, date.Month + 1, 1);
-                var query = _db.bills.Where(o => o.Uid == uid && o.PayDate >= date && o.PayDate < end && o.Amount > 0);
+                var query = _db.bills.Where(o => o.Uid == uid && o.PayDate >= date && o.PayDate < end);
                 var list = query.GroupBy(o => o.FlowType).Select(o =>
                     new KeyValuePair<string, string>(o.Key.ToString(), o.Sum(b => b.Amount).ToString("0.00")))
                     .ToList();
@@ -108,7 +110,7 @@ namespace aspnetcore.Controllers
             {
                 var statKey = $"DailyStat:{uid}:{date.ToString("yyyyMM")}";
                 var end = new DateTime(date.Year, date.Month + 1, 1);
-                var query = _db.bills.Where(o => o.Uid == uid && o.PayDate >= date && o.PayDate < end && o.Amount > 0);
+                var query = _db.bills.Where(o => o.Uid == uid && o.PayDate >= date && o.PayDate < end);
                 var list = query.GroupBy(o => o.PayDate).Select(o =>
                     new KeyValuePair<string, string>(o.Key.ToString("yyyyMMdd"), o.Sum(b => b.Amount).ToString("0.00")))
                     .ToList();

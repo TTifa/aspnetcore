@@ -17,6 +17,7 @@ namespace Entity
 
     public enum FlowType
     {
+        None = -1,
         /*支出*/
         /// <summary>
         /// 食物
