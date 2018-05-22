@@ -77,12 +77,35 @@ namespace aspnetcore.Controllers
             foreach (var uid in userIds)
             {
                 var end = new DateTime(date.Year, date.Month + 1, 1);
-                var query = _db.bills.Where(o => o.Uid == uid && o.PayDate >= date && o.PayDate < end);
+                var query = _db.bills.Where(o => o.Uid == uid && o.PayDate >= date && o.PayDate < end && o.Amount > 0);
                 var list = query.GroupBy(o => o.FlowType).Select(o =>
                     new KeyValuePair<string, string>(o.Key.ToString(), o.Sum(b => b.Amount).ToString("0.00")))
                     .ToList();
 
                 _redisCli.Hmset($"Stat:{uid}:{date.ToString("yyyyMM")}", list);
+            }
+
+            return new ApiResult();
+        }
+
+        [HttpGet("GenIncomeStat"), AllowAnonymous]
+        public ApiResult GenIncomeStat(DateTime date)
+        {
+            if (date == DateTime.MinValue)
+            {
+                var today = DateTime.Now.Date;
+                date = new DateTime(today.Year, today.Month, 1);
+            }
+            var userIds = _db.users.Where(o => o.Status == UserStatus.Normal).Select(o => o.Uid).ToList();
+            foreach (var uid in userIds)
+            {
+                var end = new DateTime(date.Year, date.Month + 1, 1);
+                var query = _db.bills.Where(o => o.Uid == uid && o.PayDate >= date && o.PayDate < end && o.Amount < 0);
+                var list = query.GroupBy(o => o.FlowType).Select(o =>
+                    new KeyValuePair<string, string>(o.Key.ToString(), o.Sum(b => -b.Amount).ToString("0.00")))
+                    .ToList();
+
+                _redisCli.Hmset($"IncomeStat:{uid}:{date.ToString("yyyyMM")}", list);
             }
 
             return new ApiResult();
@@ -110,7 +133,7 @@ namespace aspnetcore.Controllers
             {
                 var statKey = $"DailyStat:{uid}:{date.ToString("yyyyMM")}";
                 var end = new DateTime(date.Year, date.Month + 1, 1);
-                var query = _db.bills.Where(o => o.Uid == uid && o.PayDate >= date && o.PayDate < end);
+                var query = _db.bills.Where(o => o.Uid == uid && o.PayDate >= date && o.PayDate < end && o.FlowType < FlowType.Salary);
                 var list = query.GroupBy(o => o.PayDate).Select(o =>
                     new KeyValuePair<string, string>(o.Key.ToString("yyyyMMdd"), o.Sum(b => b.Amount).ToString("0.00")))
                     .ToList();

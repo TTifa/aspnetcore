@@ -27,6 +27,10 @@ namespace aspnetcore.Jobs
             var genStat = $"{_options.Host}:{_options.Port}/Api/Bill/GenStat";
             result = HttpHelper.Get(genStat);
             LogFactory.GetLogger().AddProperty("Task", "GenStat").Info(result);
+
+            var genIncomeStat = $"{_options.Host}:{_options.Port}/Api/Bill/GenIncomeStat";
+            result = HttpHelper.Get(genIncomeStat);
+            LogFactory.GetLogger().AddProperty("Task", "GenIncomeStat").Info(result);
         }
     }
 }
