@@ -119,6 +119,14 @@ namespace aspnetcore.Controllers
             return new ApiResult(data: stat);
         }
 
+        [HttpGet("IncomeStat")]
+        public ApiResult GetIncomeStat(string month)
+        {
+            var stat = _redisCli.hgetall($"IncomeStat:{CurrentUser.Uid}:{month}");
+
+            return new ApiResult(data: stat);
+        }
+
         [HttpGet("GenDailyStat"), AllowAnonymous]
         public ApiResult GenDailyStat(DateTime date)
         {
