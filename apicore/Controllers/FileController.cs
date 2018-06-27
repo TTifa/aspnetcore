@@ -12,7 +12,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using WebApiBase;
 
-namespace aspnetcore.Controllers
+namespace apicore.Controllers
 {
     public class FileController : Controller
     {

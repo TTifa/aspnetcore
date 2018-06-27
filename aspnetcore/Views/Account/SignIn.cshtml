@@ -29,6 +29,8 @@
     <div id="footer">
         <strong>Copyright &copy; 2016-2017 <a href="#">KiMo Studio</a>.</strong> All rights
     </div>
+    <script src="~/js/app.js"></script>
+    <script src="~/lib/jquery/jquery.cookie.js"></script>
     <script>
         $(function () {
             $("form").submit(function (e) {
@@ -38,11 +40,11 @@
         })
         function signin() {
             var param = {
-                UserName: $('#username').val(),
+                Username: $('#username').val(),
                 Password: $('#password').val(),
-                RememberMe: $('#rememberme').val()
+                Remember: $('#rememberme').is(':checked')
             };
-            if (!param.UserName || param.UserName.length <= 1) {
+            if (!param.Username || param.Username.length <= 1) {
                 $('#tip').text('please input username');
                 return;
             }
@@ -50,24 +52,19 @@
                 $('#tip').text('please input password');
                 return;
             }
-            $.ajax({
-                url: '/Account/SignIn',
-                type: 'post',
-                data: param,
-                dataType: 'json',
-                success: function (e) {
-                    if (e.status == 1) {
-                        var currentUser = {
-                            Uid: e.data.Uid,
-                            Username: e.data.Username,
-                            Token: e.data.Token
-                        }
-                        localStorage.setItem('LoginedUser', JSON.stringify(currentUser));
 
-                        location.href = '/Home/Index';
-                    } else {
-                        $('#tip').text(e.msg);
+            ApiClient.Post('/Api/Account/SignIn', param, function (e) { 
+                if (e.status == 1) {
+                    var currentUser = {
+                        Uid: e.data.Uid,
+                        Username: e.data.Username,
+                        Token: e.data.Token
                     }
+                    localStorage.setItem('LoginedUser', JSON.stringify(currentUser));
+                    $.cookie('access_token', currentUser.Token, { expires: 7, path: "/", secure: false, raw: false });
+                    location.href = '/Home/Index';
+                } else {
+                    $('#tip').text(e.msg);
                 }
             })
         }

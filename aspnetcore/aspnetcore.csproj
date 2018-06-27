@@ -8,6 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Models\**" />
+    <Content Remove="Models\**" />
+    <EmbeddedResource Remove="Models\**" />
+    <None Remove="Models\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="Controllers\DefaultController.cs" />
   </ItemGroup>
 
@@ -24,12 +31,7 @@
     <PackageReference Include="NLog" Version="4.5.0-rc03" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="4.5.0-rc2" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.0.0" />
-    <PackageReference Include="Pomelo.AspNetCore.TimedJob" Version="2.0.0-rtm-10046" />
     <PackageReference Include="Qiniu.Shared" Version="7.2.15" />
-    <PackageReference Include="Senparc.Weixin" Version="4.18.12" />
-    <PackageReference Include="Senparc.Weixin.MP" Version="14.8.12" />
-    <PackageReference Include="Senparc.Weixin.WxOpen" Version="1.8.2" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="1.1.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -41,10 +43,10 @@
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
     <ProjectReference Include="..\Log\Log.csproj" />
     <ProjectReference Include="..\Redis\Redis.csproj" />
+    <ProjectReference Include="..\WebApiBase\WebApiBase.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\" />
     <Folder Include="Properties\PublishProfiles\" />
   </ItemGroup>
 

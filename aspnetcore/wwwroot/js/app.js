@@ -1,4 +1,5 @@
 (function (window, $) {
+    var apiHost = 'http://localhost:10001';
     // 遮罩层对象
     var _mask = {
         show: function () { },
@@ -6,7 +7,6 @@
     };
     var _user = {
         uid: 0,
-        workstatus: 0,
         username: '',
         token: ''
     };
@@ -35,15 +35,29 @@
                 _dialog.alert('params error');
             }
             (loading || loading == '') && _mask.show(loading);
+            api = apiHost + api;
+            console.log(api);
             $.ajax({
                 type: 'POST',
                 url: api,
                 dataType: 'json',
+                //跨域携带cookie
+                //xhrFields: {
+                //    withCredentials: true
+                //},
                 contentType: "application/json; charset=utf-8",
                 data: JSON.stringify(args),
+                beforeSend: function (request) {
+                    console.log(_user.token);
+                    if (_user.token)
+                        request.setRequestHeader('access_token', _user.token);
+                },
                 success: function (data) {
                     _mask.hide();
-
+                    if (data.status == 2) {
+                        location.href = '/Account/SignIn';
+                        return;
+                    }
                     cb(data);
                 },
                 error: function (xmlRequest, textStatus, errorThrown) {
@@ -59,13 +73,26 @@
             }
             api += '?' + this.getParamStr(args);
             (loading || loading == '') && _mask.show(loading);
+            api = apiHost + api;
+            console.log(api);
             $.ajax({
                 type: 'GET',
                 url: api,
                 dataType: 'json',
+                xhrFields: {
+                    withCredentials: true
+                },
+                beforeSend: function (request) {
+                    console.log(_user.token);
+                    if (_user.token)
+                        request.setRequestHeader('access_token', _user.token);
+                },
                 success: function (data) {
                     _mask.hide();
-
+                    if (data.status == 2) {
+                        location.href = '/Account/SignIn';
+                        return;
+                    }
                     cb(data);
                 },
                 error: function (xmlRequest, textStatus, errorThrown) {
@@ -147,26 +174,10 @@
     window.APIClient = window.ApiClient = _client;
 })(window, jQuery);
 
-/*
 (function (window, $) {
-    ApiClient.setMask($.showLoading, $.hideLoading);
-    ApiClient.setDialog($.alert, $.confirm);
-    
-    var account = localStorage.getItem('Logined_Worker');
-    if (account) {
-        account = JSON.parse(account);
-        APIClient.setUser(account.Uid, account.UserName, account.Token);
-    } else {
-        var path = window.location.pathname.toLowerCase();
-        var noLogin = false;
-        for (var i = 0; i < config.NoLoginPage.length; i++) {
-            if (config.NoLoginPage[i] == path) {
-                noLogin = true;
-                break;
-            }
-        }
-        if (!noLogin)
-            window.location.href = '/login.html';
+    var loginuser = localStorage.getItem('LoginedUser');
+    if (loginuser) {
+        loginuser = JSON.parse(loginuser);
+        APIClient.setUser(loginuser.Uid, loginuser.Username, loginuser.Token);
     }
 })(window, jQuery);
-*/
